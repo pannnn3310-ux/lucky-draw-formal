@@ -1,0 +1,331 @@
+@charset "UTF-8";
+* {
+  box-sizing: border-box;
+  font-family: "Noto Sans TC", "微軟正黑體", sans-serif;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+.main {
+  position: relative;
+  overflow: hidden;
+  min-height: 900px;
+  padding: 0;
+  background-image: linear-gradient(#751516, rgba(34, 34, 34, 0.46)), url("Pngtree—japanese year of the horse_23201614.png");
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+  background-size: cover;
+  background-color: #9A0F15;
+}
+.main .container {
+  position: relative;
+}
+.main .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: 5;
+  pointer-events: none;
+}
+.main.active .overlay {
+  background: rgba(90, 87, 87, 0.7);
+}
+
+.slot {
+  width: 100%;
+  height: 400px;
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+  background: #F5DA6C;
+  background: linear-gradient(0deg, rgb(245, 218, 108) 0%, rgb(248, 187, 113) 67%, rgb(255, 178, 122) 100%, rgb(255, 196, 126) 15%);
+  border: 2px solid #fff9c7;
+  border-radius: 20px;
+  box-shadow: 15px 10px 20px 5px #3d0202, inset 0 3px 6px rgb(255, 205, 143);
+}
+.slot::before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  border: 6px dotted #fff9c7;
+  border-radius: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+.slot .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+.slot .scroll-viewport {
+  height: 270px;
+  overflow: hidden;
+  position: relative;
+}
+.slot .reel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.slot .symbol {
+  height: 90px;
+  line-height: 90px;
+  font-weight: bold;
+}
+.slot .reel {
+  border-right: 1px solid #acacac;
+}
+.slot .reel:last-child {
+  border-right: none;
+}
+.slot .symbol.winner-highlight {
+  font-size: 1.8em;
+  font-weight: bold;
+  background: rgba(208, 103, 87, 0.2);
+}
+@media (max-width: 768px) {
+  .slot .symbol.winner-highlight {
+    font-size: 26px;
+    white-space: nowrap;
+  }
+}
+
+.stick {
+  position: relative;
+  z-index: 15;
+  background-color: transparent;
+  height: 300px;
+}
+.stick::before {
+  content: "";
+  position: absolute;
+  width: 80px;
+  height: 30px;
+  top: 77%;
+  left: -30%;
+  background-color: #F8BB71;
+  background: linear-gradient(85deg, rgb(255, 176, 79) 0%, rgb(255, 182, 105) 0%, rgb(255, 151, 102) 100%);
+  border: 2px solid #fff9c7;
+  border-left: 0px;
+  border-radius: 0 20px 20px 0px;
+}
+
+.lottery-button {
+  position: absolute;
+  width: 25px;
+  height: 120px;
+  top: 47%;
+  left: 30px;
+  background: linear-gradient(-85deg, #f0b14f 0%, #f8b469 60%);
+  border: 2.5px solid #ffc7c7;
+  border-radius: 30px;
+  box-shadow: 0px 1px 2px rgba(245, 17, 17, 0.1);
+  transform-origin: bottom center;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.lottery-button::after {
+  content: "";
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  top: -30px;
+  left: -22px;
+  background: linear-gradient(30deg, #d62828 40%, #ff705e 100%);
+  border: 1px solid #fa6b6b;
+  border-radius: 50%;
+  transition: top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.5), 0 0 20px rgba(255, 77, 77, 0.3), 0 0 30px rgba(255, 77, 77, 0.2);
+  animation: glow 2s infinite ease-in-out;
+}
+
+.no-glow::after {
+  animation: none;
+  box-shadow: none;
+}
+
+.lottery-button.pull {
+  top: 75%;
+  height: 27px;
+}
+
+.lottery-button.pull::after {
+  top: 5px;
+}
+
+.trigger-draw {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: -30px;
+  left: -14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+}
+.trigger-draw :active {
+  transform: translateY(4px);
+}
+
+#prize-btn {
+  position: relative;
+}
+
+#prize-btn.dropdown-toggle {
+  font-size: 3.5rem;
+  font-weight: 500;
+  letter-spacing: 0.3vw;
+  color: #fcac00;
+  -webkit-text-stroke: 7px rgb(255, 255, 255);
+  paint-order: stroke;
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+#prize-btn + .dropdown-menu {
+  width: 20%;
+  left: 50% !important;
+  top: 100% !important;
+  font-size: 20px;
+  transform: translateX(-50%) !important;
+}
+
+.right-panel {
+  width: 100%;
+  background-color: #fcecec;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(114, 114, 114, 0.2);
+  padding: 1em;
+}
+.right-panel h3 {
+  font-size: 1.4em;
+  color: #ca2b2b;
+  margin-bottom: 1em;
+}
+
+.winner-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.winner-list li {
+  font-size: 1em;
+  font-weight: bold;
+  color: #822005;
+  background-color: #ffffff;
+  border-radius: 5px;
+  margin-bottom: 0.5em;
+  padding: 0.5em;
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 77, 77, 0.2), 0 0 10px rgba(255, 77, 77, 0.3), 0 0 20px rgba(255, 77, 77, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 77, 77, 0.7), 0 0 40px rgba(255, 77, 77, 0.5), 0 0 60px rgba(255, 77, 77, 0.3);
+  }
+}
+.freeze-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  -webkit-backdrop-filter: none;
+          backdrop-filter: none;
+  pointer-events: none;
+  transition: 0.3s ease;
+}
+
+.freeze-overlay.active {
+  background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(4px);
+          backdrop-filter: blur(4px);
+}
+
+/* --- 超狂電視壞掉效果 --- */
+.glitch-tv {
+  position: relative;
+  animation: tv-shake 0.25s infinite, tv-flicker 0.3s infinite alternate;
+}
+
+/* RGB 分裂 */
+.glitch-tv::before,
+.glitch-tv::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  clip-path: inset(0 0 0 0);
+}
+
+.glitch-tv::before {
+  left: 4px;
+  text-shadow: -4px 0 red;
+  animation: glitch-slice 0.25s infinite;
+}
+
+.glitch-tv::after {
+  left: -4px;
+  text-shadow: 4px 0 rgb(0, 0, 0);
+  animation: glitch-slice 0.3s infinite reverse;
+}
+
+/* 主畫面震動 */
+@keyframes tv-shake {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-3px, 2px);
+  }
+  40% {
+    transform: translate(3px, -2px);
+  }
+  60% {
+    transform: translate(-2px, 1px);
+  }
+  80% {
+    transform: translate(2px, -1px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+/* 閃爍 + 噪波 */
+@keyframes tv-flicker {
+  0% {
+    opacity: 0.9;
+    filter: contrast(1) brightness(1);
+  }
+  50% {
+    opacity: 0.5;
+    filter: contrast(1.4) brightness(0.7);
+  }
+  100% {
+    opacity: 1;
+    filter: contrast(0.8) brightness(1.2);
+  }
+}
+#hand-animation-container {
+  width: 400px;
+  height: 400px;
+  position: absolute;
+  right: -80px;
+  top: 120px;
+  display: none;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.8);
+  -webkit-backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
+  z-index: 99999;
+}
+
+.check-style {
+  font-size: 30px;
+}/*# sourceMappingURL=all.css.map */
