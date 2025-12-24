@@ -13,10 +13,30 @@ const dropdownItems = document.querySelectorAll('.dropdown-item');
 const specialPrizeContainer = document.querySelector('#special-prize-container');
 const specialPrizeInput = document.querySelector('#special-prize-input');
 const specialPrizeInput2 = document.querySelector('#special-prize-input2');
+const specialPrizeDropdown2  = document.querySelector('#special-prize-dropdown2');
+const specialPrizeAmountSelect = document.getElementById('special-prize-amount-select');
+
+
 const winnerLists = [
   document.querySelector('#winner-list'),
   document.querySelector('#winner-list-mobile')
 ];
+
+specialPrizeInput.addEventListener('focus', () => {
+  buildWinnerDropdown(specialPrizeInput);
+});
+
+specialPrizeInput.addEventListener('input', e => {
+  filterWinnerDropdown(e.target.value);
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#winner-dropdown') &&
+      e.target !== specialPrizeInput) {
+    document.getElementById('winner-dropdown').style.display = "none";
+  }
+});
+
 
 
 const ITEM_HEIGHT = 90;
@@ -80,6 +100,7 @@ document.querySelectorAll('#file-input').forEach(input => {
       populateReels();
       startAutoScroll();
       updateCounts();
+      populateSpecialPrizeList();
     };
     reader.readAsArrayBuffer(e.target.files[0]);
   });
@@ -105,12 +126,12 @@ document.querySelector('#export-btn').addEventListener('click', () => {
   ]);
 
   //加標題列
-  const ws = XLSX.utils.aoa_to_sheet([['獎項', '加碼', '部門', '姓名']].concat(wsData));
+  const ws = XLSX.utils.aoa_to_sheet([['獎項名稱', '加碼', '中獎人部門', '中獎人姓名']].concat(wsData));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '中獎名單');
 
   //下載 Excel
-  XLSX.writeFile(wb, '大寶尾牙中獎名單.xlsx');
+  XLSX.writeFile(wb, '大寶2026年尾牙中獎名單.xlsx');
 });
 
 
@@ -360,6 +381,7 @@ async function doDraw() {
 
     // 中獎文字與效果
     handleWinnerText(winner);
+    populateSpecialPrizeList();
 
     setTimeout(() => {
       main.classList.remove('active');
@@ -473,33 +495,41 @@ function handleWinnerText(winner) {
   let displayText = '';
   let bonusText = '';
 
-  if (dropdownButton.dataset.value === "8") {
-    const bonus = specialPrizeInput.value.trim();
-    if (bonus) bonusText = bonus;
-    displayText = `特別獎：${winner.dept} - ${winner.firstPart}${winner.restPart}`;
+  // 判斷是否幸運分享獎
+  if (dropdownButton.dataset.value === "9") {
+    bonusText = specialPrizeInput.value.trim();
     specialPrizeInput.value = "";
     specialPrizeInput.style.display = "none";
+
+    displayText = `${prizeText.textContent}：${winner.dept} - ${winner.firstPart}${winner.restPart}`;
+  } else if (dropdownButton.dataset.value === "10") {
+    bonusText = specialPrizeInput2.value.trim();
+    specialPrizeInput2.value = "";
+    specialPrizeInput2.style.display = "none";
+
+    displayText = `現金加碼獎：${winner.dept} - ${winner.firstPart}${winner.restPart}`;
   } else {
     displayText = `${prizeText.textContent}：${winner.dept} - ${winner.firstPart}${winner.restPart}`;
-  };
+  }
 
-  // 存入結果
+  // **加入 winnerData**
   winnerData.push({
     dept: winner.dept,
     name: `${winner.firstPart}${winner.restPart}`,
     prize: prizeText.textContent,
     bonus: bonusText
   });
-  updateCounts();
 
-  // 顯示中獎名單
+  // **加入 li 列表**
   const li = document.createElement('li');
   li.dataset.key = `${winner.dept}-${winner.firstPart}${winner.restPart}`;
-  li.innerHTML = `${displayText}${bonusText ? '（加碼：' + bonusText + '）' : ''}<span class="remove-btn" style="cursor:pointer;color:red;margin-left:10px;">✖</span>`;
+  li.innerHTML = `${displayText}${bonusText ? '（' + bonusText + '）' : ''}<span class="remove-btn" style="cursor:pointer;color:red;margin-left:10px;">✖</span>`;
   winnerLists.forEach(list => list.insertBefore(li.cloneNode(true), list.firstChild));
 
   showWinnerEffect();
+  updateCounts();
 };
+
 
 // 清除中獎者
 winnerLists.forEach(list => {
@@ -628,3 +658,155 @@ let handAnim = lottie.loadAnimation({
   autoplay: false,   //不自動播放
   path: './Artboard1.json'
 });
+
+//中獎人選
+function buildWinnerDropdown(inputEl) {
+  const dropdown = document.getElementById('winner-dropdown');
+  dropdown.innerHTML = "";
+
+  if (!winnerData.length) {
+    dropdown.style.display = "none";
+    return;
+  };
+
+  winnerData.forEach(w => {
+    const btn = document.createElement('button');
+    btn.type = "button";
+    btn.className = "list-group-item list-group-item-action";
+    btn.textContent = `${w.prize} - ${w.name}`;
+
+    btn.addEventListener('click', () => {
+      inputEl.value = btn.textContent;
+      dropdown.style.display = "none";
+    });
+
+    dropdown.appendChild(btn);
+  });
+
+  dropdown.style.display = "block";
+};
+
+function filterWinnerDropdown(keyword) {
+  const dropdown = document.getElementById('winner-dropdown');
+  const items = dropdown.querySelectorAll('button');
+
+  let hasVisible = false;
+
+  items.forEach(item => {
+    const match = item.textContent.includes(keyword);
+    item.style.display = match ? "block" : "none";
+    if (match) hasVisible = true;
+  });
+
+  dropdown.style.display = hasVisible ? "block" : "none";
+};
+
+
+//現金加碼
+
+function populateSpecialPrizeList() {
+  const datalist = document.getElementById('special-prize-list');
+  datalist.innerHTML = "";
+
+
+  // 可以選 allNames 或 winnerData
+  allNames.forEach(p => {
+    const option = document.createElement('option');
+    option.value = `${p.dept} - ${p.firstPart}${p.restPart}`;
+    datalist.appendChild(option);
+  });
+};
+
+
+function populateSpecialPrizeList2() {
+  // 這裡不用填 datalist，改成動態 dropdown
+  specialPrizeInput2.addEventListener('input', () => {
+    const keyword = specialPrizeInput2.value.trim().toLowerCase();
+    specialPrizeDropdown2.innerHTML = '';
+
+    if (!keyword) {
+      specialPrizeDropdown2.style.display = 'none';
+      return;
+    }
+
+    const filtered = allNames.filter(p => {
+      const fullName = `${p.dept} - ${p.firstPart}${p.restPart}`.toLowerCase();
+      return fullName.includes(keyword);
+    });
+
+    if (filtered.length === 0) {
+      specialPrizeDropdown2.style.display = 'none';
+      return;
+    }
+
+    filtered.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'dropdown-item';
+      div.textContent = `${p.dept} - ${p.firstPart}${p.restPart}`;
+      div.style.cursor = 'pointer';
+
+      div.addEventListener('click', () => {
+        specialPrizeInput2.value = div.textContent;
+        specialPrizeDropdown2.style.display = 'none';
+      });
+
+      specialPrizeDropdown2.appendChild(div);
+    });
+
+    const rect = specialPrizeInput2.getBoundingClientRect();
+    specialPrizeDropdown2.style.top = rect.bottom + window.scrollY + 'px';
+    specialPrizeDropdown2.style.left = rect.left + window.scrollX + 'px';
+    specialPrizeDropdown2.style.width = rect.width + 'px';
+    specialPrizeDropdown2.style.display = 'block';
+  });
+
+  // 點空白收起 dropdown
+  document.addEventListener('click', e => {
+    if (!specialPrizeDropdown2.contains(e.target) && e.target !== specialPrizeInput2) {
+      specialPrizeDropdown2.style.display = 'none';
+    }
+  });
+}
+
+// 初始化呼叫
+populateSpecialPrizeList2();
+
+
+// 下拉金額
+function populateSpecialPrizeAmountSelect() {
+  const min = 2000;
+  const max = 30000;
+  const step = 500;
+
+  specialPrizeAmountSelect.innerHTML = '<option value="">請選擇金額</option>';
+
+  for (let i = min; i <= max; i += step) {
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = i.toLocaleString() + ' 元';
+    specialPrizeAmountSelect.appendChild(option);
+  };
+};
+
+// 選擇下拉 → 填入 input，不清掉原文字
+specialPrizeAmountSelect.addEventListener('change', () => {
+  if (!specialPrizeAmountSelect.value) return;
+
+  let currentText = specialPrizeInput2.value.trim();
+
+  if (!currentText) {
+    // 如果原本沒文字，直接填入金額，這裡加上單位「元」
+    specialPrizeInput2.value = `${specialPrizeAmountSelect.value}元`;
+    return;
+  }
+
+  // 檢查原文字是否已經有括號的金額
+  const match = currentText.match(/^(.*?)(?:（.*?）)?$/);
+  if (match) {
+    const namePart = match[1]; // 保留名字/部門
+    specialPrizeInput2.value = `${namePart}（${specialPrizeAmountSelect.value}元）`;
+  }
+});
+
+// 初始化呼叫
+populateSpecialPrizeAmountSelect();

@@ -66,10 +66,30 @@
                     <a class="dropdown-item" href="#" data-value="10">現金加碼獎</a>
                   </li>
                 </ul>
-                <div id="special-prize-container" class="mt-2" style="display:none;">
-                  <input type="text" id="special-prize-input" class="form-control form-control-sm p-3 fs-3" style="display:none;" placeholder="輸入分享金額">
-                  <input type="text" id="special-prize-input2" class="form-control form-control-sm p-3 fs-3" style="display:none;" placeholder="輸入加碼金額">
-                </div>
+              <div id="special-prize-container" class="mt-2" style="display:none;">
+                <input
+                  id="special-prize-input"
+                  class="form-control form-control-sm p-3 fs-3"
+                  placeholder="輸入分享金額"
+                  autocomplete="off"
+                />
+                <div
+                  id="winner-dropdown"
+                  class="list-group position-absolute w-100"
+                  style="z-index: 9999; display: none; max-height: 260px; overflow-y: auto;"
+                ></div>
+
+                <input type="text" id="special-prize-input2" class="form-control form-control-sm p-3 fs-3"
+                style="display:none;"
+                list="special-prize-list"
+                placeholder="輸入加碼金額">
+                  <select id="special-prize-amount-select" class="form-select form-select-sm p-2 fs-4 mt-2">
+                    <option value="">請選擇金額</option>
+                  </select>
+
+                <div id="special-prize-dropdown2" class="dropdown-menu" style="display:none; position:absolute; z-index:999;"></div>
+                <datalist id="special-prize-list"></datalist>
+              </div>
             </div>
           </div>
           <div class="slot p-3 fs-4"  id="slot-box">
