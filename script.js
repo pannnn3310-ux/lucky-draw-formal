@@ -12,7 +12,7 @@ const lever = document.querySelector('.lever');
 const dropdownItems = document.querySelectorAll('.dropdown-item');
 const specialPrizeContainer = document.querySelector('#special-prize-container');
 const specialPrizeInput = document.querySelector('#special-prize-input');
-const specialPrizeBtn = document.querySelector('#special-prize-btn');
+const specialPrizeInput2 = document.querySelector('#special-prize-input2');
 const winnerLists = [
   document.querySelector('#winner-list'),
   document.querySelector('#winner-list-mobile')
@@ -202,22 +202,21 @@ dropdownItems.forEach(item => {
     prizeText.textContent = item.textContent;
     dropdownButton.dataset.value = value;
 
-    if (value === "8") {
+    if (value === "9") {
       specialPrizeContainer.style.display = "block";
-      specialPrizeBtn.style.display = "inline-block";
+      specialPrizeInput.style.display = "inline-block";
+      specialPrizeInput2.style.display = "none";
+    } else if (value === "10"){
+      specialPrizeContainer.style.display = "block";
+      specialPrizeInput2.style.display = "inline-block";
       specialPrizeInput.style.display = "none";
     } else {
       specialPrizeContainer.style.display = "none";
     };
+
   });
 });
 
-//加碼按鈕判斷
-specialPrizeBtn.addEventListener('click', () => {
-  specialPrizeBtn.style.display = "none";
-  specialPrizeInput.style.display = "block";
-  specialPrizeInput.focus();
-});
 
 // 拉霸按鈕事件
 document.querySelectorAll('.lever .prize-btn').forEach(btn => {
@@ -259,7 +258,9 @@ function getFullRounds(prizeValue) {
     5: 7,
     6: 5,
     7: 4,
-    8: 3
+    8: 3,
+    9: 3,
+    10: 3
   };
   return roundsMap[prizeValue] || 3;
 };
@@ -477,7 +478,6 @@ function handleWinnerText(winner) {
     if (bonus) bonusText = bonus;
     displayText = `特別獎：${winner.dept} - ${winner.firstPart}${winner.restPart}`;
     specialPrizeInput.value = "";
-    specialPrizeBtn.style.display = "inline-block";
     specialPrizeInput.style.display = "none";
   } else {
     displayText = `${prizeText.textContent}：${winner.dept} - ${winner.firstPart}${winner.restPart}`;
