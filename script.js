@@ -333,8 +333,8 @@ async function doDraw() {
 
   const reelDurations = [
     baseDuration + fullRounds * durationPerRound,
-    baseDuration + fullRounds * durationPerRound + 300,
-    baseDuration + fullRounds * durationPerRound + 600
+    baseDuration + fullRounds * durationPerRound + 3000,
+    baseDuration + fullRounds * durationPerRound + 6000
   ];
 
   if (dropdownButton.dataset.value === "1") {
