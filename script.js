@@ -121,12 +121,13 @@ document.querySelector('#export-btn').addEventListener('click', () => {
   const wsData = winnerData.map(w => [
     w.prize,
     w.bonus,
+    w.specialBonus,
     w.dept,
     w.name,
   ]);
 
   //加標題列
-  const ws = XLSX.utils.aoa_to_sheet([['獎項名稱', '加碼獎項','中獎人部門', '中獎人姓名']].concat(wsData));
+  const ws = XLSX.utils.aoa_to_sheet([['獎項名稱', '加碼人', '額外加碼','中獎人部門', '中獎人姓名']].concat(wsData));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '中獎名單');
 
@@ -222,7 +223,9 @@ dropdownItems.forEach(item => {
     const value = item.dataset.value;
     prizeText.textContent = item.textContent;
     dropdownButton.dataset.value = value;
-
+    specialPrizeAmountSelect.value = '';
+    specialPrizeInput.value = '';
+    specialPrizeInput2.value = '';
     if (value === "9") {
       specialPrizeContainer.style.display = "block";
       specialPrizeInput.style.display = "inline-block";
@@ -500,11 +503,16 @@ function handleWinnerText(winner) {
   let displayText = `${prizeName}：${winner.dept}-${winner.firstPart}${winner.restPart}`;
   let specialText = `${winner.dept}-${winner.firstPart}${winner.restPart}`;
   let bonusText = "";
+  let specialBonusText = "";
 
   if (prizeValue === "9") {
     bonusText = specialPrizeInput.value?.trim() || "";
+
   } else if (prizeValue === "10") {
     bonusText = specialPrizeInput2.value?.trim() || "";
+    specialBonusText = specialPrizeAmountSelect.value
+    ? `${specialPrizeAmountSelect.value}元`
+    : "";
   };
 
   const li = document.createElement('li');
@@ -513,14 +521,14 @@ function handleWinnerText(winner) {
   // 判斷是否幸運分享獎
   if (prizeValue  === "9") {
     li.innerHTML = `
-      <p>幸運分享獎中獎人：${specialText}</p>
-      <p>（分享來源人：${bonusText}）</p>
+      <p>幸運分享中獎人：${specialText}</p>
+      <p style="color:#D67158;">（分享來源人：${bonusText}加碼）</p>
       <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
   `;
   } else if (prizeValue === "10") {
     li.innerHTML = `
-      <p>現金加碼獎中獎人：${specialText}</p>
-      <p>（加碼來源人：${bonusText}）</p>
+      <p>現金加碼中獎人：${specialText}</p>
+      <p style="color:#D67158;">（加碼來源人：${bonusText}加碼：${specialBonusText}）</p>
       <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
   `;
   } else {
@@ -536,6 +544,7 @@ function handleWinnerText(winner) {
     name: `${winner.firstPart}${winner.restPart}`,
     prize: prizeText.textContent,
     bonus: bonusText,
+    specialBonus: specialBonusText,
   });
 
   winnerLists.forEach(list => list.insertBefore(li.cloneNode(true), list.firstChild));
@@ -579,9 +588,7 @@ winnerLists.forEach(list => {
       drawnWinners.delete(key);
       winnerData = winnerData.filter(w => `${w.dept}-${w.name}` !== key);
 
-      winnerLists.forEach(list => {
-        list.insertBefore(li.cloneNode(true), list.firstChild);
-      });
+      li.remove();
 
       updateCounts();
 
@@ -803,25 +810,8 @@ function populateSpecialPrizeAmountSelect() {
   };
 };
 
-// 選擇下拉 → 填入 input，不清掉原文字
-specialPrizeAmountSelect.addEventListener('change', () => {
-  if (!specialPrizeAmountSelect.value) return;
 
-  let currentText = specialPrizeInput2.value.trim();
-
-  if (!currentText) {
-    // 如果原本沒文字，直接填入金額，這裡加上單位「元」
-    specialPrizeInput2.value = `${specialPrizeAmountSelect.value}元`;
-    return;
-  }
-
-  // 檢查原文字是否已經有括號的金額
-  const match = currentText.match(/^(.*?)(?:（.*?）)?$/);
-  if (match) {
-    const namePart = match[1]; // 保留名字/部門
-    specialPrizeInput2.value = `${namePart}（${specialPrizeAmountSelect.value}元）`;
-  }
-});
 
 // 初始化呼叫
 populateSpecialPrizeAmountSelect();
+
