@@ -127,10 +127,10 @@ document.querySelector('#export-btn').addEventListener('click', () => {
   const wsData = winnerData.map(w => [
     `${w.dept} - ${w.name}`,
     w.prize,
-    w.bonusSource,
-    w.prizeAmounts,
-    w.specialBonus,
-    w.bonus2Source,
+    w.bonusSource,  //中獎來源
+    w.prizeAmounts, //公司提供金額
+    w.specialBonus, //加碼金額
+    w.bonus2Source, //加碼來源
     w.balance
   ]);
 
@@ -146,31 +146,23 @@ document.querySelector('#export-btn').addEventListener('click', () => {
 
 function populateReels() {
   reels.forEach(r => {
-    r.el.innerHTML = '';
-    r.items = [];
-    r.mapIndex = [];
-  });
+  r.el.innerHTML = '';
+  r.items = [];
+  r.mapIndex = [];
+});
 
-  const displayCount = Math.min(allNames.length, 20); // 限制初始顯示筆數
-  for (let i = 0; i < displayCount; i++) {
-    appendReelItems(i);
-  };
-};
-//滾輪items
-function appendReelItems(startIndex) {
-  reels.forEach((r, reelIndex) => {
-    for (let i = startIndex; i < startIndex + 20 && i < allNames.length; i++) {
-      const p = allNames[i];
-      let val = reelIndex === 0 ? p.dept : reelIndex === 1 ? p.id : p.name;
+  allNames.forEach((p, i) => {
+    reels.forEach((r, reelIndex) => {
       const div = document.createElement('div');
       div.className = 'symbol';
-      div.textContent = val;
+      div.textContent = reelIndex === 0 ? p.dept : reelIndex === 1 ? p.id : p.name;
       r.el.appendChild(div);
       r.items.push(div);
-      r.mapIndex.push(i); // 對應 allNames 索引
-    };
+      r.mapIndex.push(i); // mapIndex 直接對應 allNames 索引
+    });
   });
 };
+
 
 function ensureReelLoop(reel, reelIndex) {
   const viewportHeight = document.querySelector('.scroll-viewport').offsetHeight;
@@ -228,7 +220,7 @@ dropdownItems.forEach(item => {
       specialPrizeContainer.style.display = "block";
       specialPrizeInput.style.display = "inline-block";
       specialPrizeInput2.style.display = "none";
-      specialPrizeAmountInput.style.display = "none";
+      specialPrizeAmountInput.style.display = "block";
     } else if (value === "10"){
       specialPrizeContainer.style.display = "block";
       specialPrizeInput2.style.display = "inline-block";
@@ -430,7 +422,7 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
 
       // 找第一個對應 targetIndex 的位置
       const reelTargetIndex = reel.mapIndex.indexOf(targetIndex);
-      const targetPos = targetIndex * ITEM_HEIGHT - centerOffset;
+      const targetPos = reelTargetIndex * ITEM_HEIGHT - centerOffset;
       const totalHeight = ITEM_HEIGHT * reel.items.length;
 
       function easeOutQuad(t) { return t * (2 - t); }
@@ -463,9 +455,26 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
 
 // 中獎框線
 function highlightReel(i, winnerIndex) {
+  // 先移除所有舊的 highlight
   reels[i].items.forEach(item => item.classList.remove('winner-highlight'));
-  reels[i].items[winnerIndex].classList.add('winner-highlight');
+
+  // 找對應的 reelItemIndex
+  let reelItemIndex = reels[i].mapIndex.indexOf(winnerIndex);
+
+  // 如果找不到，先補足滾輪 items
+  if (reelItemIndex === -1) {
+    // append 新的 item 直到包含 winnerIndex
+    appendReelItems(reels[i].items.length);
+    // 再重新找一次
+    reelItemIndex = reels[i].mapIndex.indexOf(winnerIndex);
+  };
+
+  // 最後安全檢查
+  if (reelItemIndex >= 0 && reelItemIndex < reels[i].items.length) {
+    reels[i].items[reelItemIndex].classList.add('winner-highlight');
+  };
 };
+
 
 
 // 紙花特效
@@ -489,14 +498,7 @@ function handleWinnerText(winner) {
 
   const prizeValue = dropdownButton.dataset.value;
   const prizeName = prizeText.textContent;
-  const companyPrizeAmount =
-  prizeAmounts[prizeValue]
-    ? `【金額${prizeAmounts[prizeValue].toLocaleString()} 元】`
-    : "";
-
-  let displayText = companyPrizeAmount
-  ? `${prizeName}${companyPrizeAmount}：`
-  : `${prizeName}`
+  let companyPrizeValue = prizeAmounts[prizeValue] || 0;
 
   let prizeAmountsText = `${winner.dept} - ${winner.name}`;
   let bonusText = "";
@@ -505,13 +507,19 @@ function handleWinnerText(winner) {
 
   if (prizeValue === "9") {
     bonusText = specialPrizeInput.value?.trim() || "";
-
+    companyPrizeValue = Number(specialPrizeAmountInput.value) || 0;
   } else if (prizeValue === "10") {
     bonus2Text = specialPrizeInput2.value?.trim() || "";
     specialBonusText = specialPrizeAmountInput.value
-    ? `${specialPrizeAmountInput.value}元`
+    ? `${Number(specialPrizeAmountInput.value).toLocaleString()}元`
     : "";
   };
+  const companyPrizeAmount = companyPrizeValue
+  ? `【金額：${companyPrizeValue.toLocaleString()}】`
+  : "";
+  let displayText = companyPrizeAmount
+  ? `${prizeName}${companyPrizeAmount}：`
+  : `${prizeName}`;
 
   const li = document.createElement('li');
     li.dataset.key = `${winner.dept}-${winner.name}`;
@@ -519,8 +527,8 @@ function handleWinnerText(winner) {
   // 判斷是否幸運分享獎
   if (prizeValue  === "9") {
     li.innerHTML = `
-      <p>${displayText}【金額：${bonusText}】：${prizeAmountsText}</p>
-      <p style="color:#D67158;">（${bonusText}）</p>
+      <p>${displayText}${prizeAmountsText}</p>
+      <p style="color:#D67158;">【${bonusText}-幸運分享】</p>
       <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
   `;
   } else if (prizeValue === "10") {
@@ -543,7 +551,7 @@ function handleWinnerText(winner) {
     name: winner.name,
     prize: prizeText.textContent,
     bonusSource: bonusText,
-    prizeAmounts: prizeAmounts[prizeValue] || 0,
+    prizeAmounts: companyPrizeValue,
     specialBonus: specialBonusText,
     bonus2Source: bonus2Text
   });
@@ -645,7 +653,7 @@ async function playPrizeAnimation(midTime = 1000) { // 傳入中間動畫時間
 
   // glitch-tv 效果縮短
   panel.classList.add("glitch-tv");
-  await new Promise(resolve => setTimeout(resolve, midTime)); 
+  await new Promise(resolve => setTimeout(resolve, midTime));
   panel.classList.remove("glitch-tv");
 
   // 縮短消失停留
@@ -687,7 +695,7 @@ function buildWinnerDropdown(inputEl) {
     const btn = document.createElement('button');
     btn.type = "button";
     btn.className = "list-group-item list-group-item-action";
-    btn.textContent = `${w.prize} - ${w.name}`;
+    btn.textContent = `${w.dept} - ${w.name}`;
 
     btn.addEventListener('click', () => {
       inputEl.value = btn.textContent;
@@ -733,7 +741,6 @@ function populateSpecialPrizeList() {
 
 
 function populateSpecialPrizeList2() {
-
   specialPrizeInput2.addEventListener('input', () => {
     const keyword = specialPrizeInput2.value.trim().toLowerCase();
     specialPrizeDropdown2.innerHTML = '';
