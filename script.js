@@ -14,7 +14,7 @@ const specialPrizeContainer = document.querySelector('#special-prize-container')
 const specialPrizeInput = document.querySelector('#special-prize-input');
 const specialPrizeInput2 = document.querySelector('#special-prize-input2');
 const specialPrizeDropdown2  = document.querySelector('#special-prize-dropdown2');
-const specialPrizeAmountSelect = document.getElementById('special-prize-amount-select');
+const specialPrizeAmountSelect = document.querySelector('#special-prize-amount-select');
 
 
 const winnerLists = [
@@ -126,7 +126,7 @@ document.querySelector('#export-btn').addEventListener('click', () => {
   ]);
 
   //加標題列
-  const ws = XLSX.utils.aoa_to_sheet([['獎項名稱', '加碼', '中獎人部門', '中獎人姓名']].concat(wsData));
+  const ws = XLSX.utils.aoa_to_sheet([['獎項名稱', '加碼獎項','中獎人部門', '中獎人姓名']].concat(wsData));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '中獎名單');
 
@@ -227,10 +227,12 @@ dropdownItems.forEach(item => {
       specialPrizeContainer.style.display = "block";
       specialPrizeInput.style.display = "inline-block";
       specialPrizeInput2.style.display = "none";
+      specialPrizeAmountSelect.style.display = "none";
     } else if (value === "10"){
       specialPrizeContainer.style.display = "block";
       specialPrizeInput2.style.display = "inline-block";
       specialPrizeInput.style.display = "none";
+      specialPrizeAmountSelect.style.display = "block";
     } else {
       specialPrizeContainer.style.display = "none";
     };
@@ -302,9 +304,9 @@ async function doDraw() {
   const main = document.querySelector('.main');
   main.classList.add('active');
 
-  const hand = document.getElementById('hand-animation-container');
-  hand.style.display = 'block';
-  handAnim.goToAndPlay(0, true); // 從頭播放
+  // const hand = document.getElementById('hand-animation-container');
+  // hand.style.display = 'block';
+  // handAnim.goToAndPlay(0, true); // 從頭播放
 
   // **決定中獎者的地方,已平均隨機方式抽取一名
   const winner = available[Math.floor(Math.random() * available.length)];
@@ -391,7 +393,7 @@ async function doDraw() {
       // 隱藏手動畫
       const hand = document.getElementById('hand-animation-container');
       hand.style.display = 'none';
-      handAnim.stop();
+      // handAnim.stop();
     }, 4000);
   } else {
     // 其他獎項保持原流程
@@ -412,9 +414,9 @@ async function doDraw() {
           r.items[reelTargetIndexes[i]].classList.add('winner-highlight');
         });
         handleWinnerText(winner);
-          const hand = document.getElementById('hand-animation-container');
-          hand.style.display = 'none';
-          handAnim.stop();
+          // const hand = document.getElementById('hand-animation-container');
+          // hand.style.display = 'none';
+          // handAnim.stop();
         setTimeout(() => {
           main.classList.remove('active');
           lever.classList.remove('no-glow');
@@ -492,38 +494,50 @@ function showWinnerEffect() {
 
 //整合中獎後續動作特效
 function handleWinnerText(winner) {
-  let displayText = '';
-  let bonusText = '';
+
+  const prizeValue = dropdownButton.dataset.value;
+  const prizeName = prizeText.textContent;
+  let displayText = `${prizeName}：${winner.dept}-${winner.firstPart}${winner.restPart}`;
+  let specialText = `${winner.dept}-${winner.firstPart}${winner.restPart}`;
+  let bonusText = "";
+
+  if (prizeValue === "9") {
+    bonusText = specialPrizeInput.value?.trim() || "";
+  } else if (prizeValue === "10") {
+    bonusText = specialPrizeInput2.value?.trim() || "";
+  };
+
+  const li = document.createElement('li');
+    li.dataset.key = `${winner.dept}-${winner.firstPart}${winner.restPart}`;
 
   // 判斷是否幸運分享獎
-  if (dropdownButton.dataset.value === "9") {
-    bonusText = specialPrizeInput.value.trim();
-    specialPrizeInput.value = "";
-    specialPrizeInput.style.display = "none";
-
-    displayText = `${prizeText.textContent}：${winner.dept} - ${winner.firstPart}${winner.restPart}`;
-  } else if (dropdownButton.dataset.value === "10") {
-    bonusText = specialPrizeInput2.value.trim();
-    specialPrizeInput2.value = "";
-    specialPrizeInput2.style.display = "none";
-
-    displayText = `現金加碼獎：${winner.dept} - ${winner.firstPart}${winner.restPart}`;
+  if (prizeValue  === "9") {
+    li.innerHTML = `
+      <p>幸運分享獎中獎人：${specialText}</p>
+      <p>（分享來源人：${bonusText}）</p>
+      <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
+  `;
+  } else if (prizeValue === "10") {
+    li.innerHTML = `
+      <p>現金加碼獎中獎人：${specialText}</p>
+      <p>（加碼來源人：${bonusText}）</p>
+      <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
+  `;
   } else {
-    displayText = `${prizeText.textContent}：${winner.dept} - ${winner.firstPart}${winner.restPart}`;
-  }
+      li.innerHTML = `
+      <p>${displayText}</p>
+      <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
+    `;
+  };
 
   // **加入 winnerData**
   winnerData.push({
     dept: winner.dept,
     name: `${winner.firstPart}${winner.restPart}`,
     prize: prizeText.textContent,
-    bonus: bonusText
+    bonus: bonusText,
   });
 
-  // **加入 li 列表**
-  const li = document.createElement('li');
-  li.dataset.key = `${winner.dept}-${winner.firstPart}${winner.restPart}`;
-  li.innerHTML = `${displayText}${bonusText ? '（' + bonusText + '）' : ''}<span class="remove-btn" style="cursor:pointer;color:red;margin-left:10px;">✖</span>`;
   winnerLists.forEach(list => list.insertBefore(li.cloneNode(true), list.firstChild));
 
   showWinnerEffect();
@@ -565,9 +579,8 @@ winnerLists.forEach(list => {
       drawnWinners.delete(key);
       winnerData = winnerData.filter(w => `${w.dept}-${w.name}` !== key);
 
-      winnerLists.forEach(l => {
-        const removeLi = l.querySelector(`li[data-key="${key}"]`);
-        if (removeLi) removeLi.remove();
+      winnerLists.forEach(list => {
+        list.insertBefore(li.cloneNode(true), list.firstChild);
       });
 
       updateCounts();
@@ -651,15 +664,17 @@ async function freezeMidAnimation() {
   reels.forEach(r => r.el.style.transition = "");
 };
 
-let handAnim = lottie.loadAnimation({
-  container: document.getElementById('hand-animation-container'),
-  renderer: 'svg',
-  loop: true,
-  autoplay: false,   //不自動播放
-  path: './Artboard1.json'
-});
+// let handAnim = lottie.loadAnimation({
+//   container: document.getElementById('hand-animation-container'),
+//   renderer: 'svg',
+//   loop: true,
+//   autoplay: false,   //不自動播放
+//   path: './Artboard1.json'
+// });
 
 //中獎人選
+
+
 function buildWinnerDropdown(inputEl) {
   const dropdown = document.getElementById('winner-dropdown');
   dropdown.innerHTML = "";
@@ -719,7 +734,7 @@ function populateSpecialPrizeList() {
 
 
 function populateSpecialPrizeList2() {
-  // 這裡不用填 datalist，改成動態 dropdown
+
   specialPrizeInput2.addEventListener('input', () => {
     const keyword = specialPrizeInput2.value.trim().toLowerCase();
     specialPrizeDropdown2.innerHTML = '';
@@ -727,7 +742,7 @@ function populateSpecialPrizeList2() {
     if (!keyword) {
       specialPrizeDropdown2.style.display = 'none';
       return;
-    }
+    };
 
     const filtered = allNames.filter(p => {
       const fullName = `${p.dept} - ${p.firstPart}${p.restPart}`.toLowerCase();
@@ -737,7 +752,7 @@ function populateSpecialPrizeList2() {
     if (filtered.length === 0) {
       specialPrizeDropdown2.style.display = 'none';
       return;
-    }
+    };
 
     filtered.forEach(p => {
       const div = document.createElement('div');
@@ -764,9 +779,9 @@ function populateSpecialPrizeList2() {
   document.addEventListener('click', e => {
     if (!specialPrizeDropdown2.contains(e.target) && e.target !== specialPrizeInput2) {
       specialPrizeDropdown2.style.display = 'none';
-    }
+    };
   });
-}
+};
 
 // 初始化呼叫
 populateSpecialPrizeList2();
@@ -774,7 +789,7 @@ populateSpecialPrizeList2();
 
 // 下拉金額
 function populateSpecialPrizeAmountSelect() {
-  const min = 2000;
+  const min = 2100;
   const max = 30000;
   const step = 500;
 
