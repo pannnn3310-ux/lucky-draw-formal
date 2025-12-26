@@ -83,9 +83,12 @@
                 style="display:none;"
                 list="special-prize-list"
                 placeholder="選擇加碼人">
-                  <select id="special-prize-amount-select" class="form-select form-select-sm fs-4 mt-2">
-                    <option value="">請選擇金額</option>
-                  </select>
+
+                  <input type="number" id="special-prize-amount-input"
+                    class="form-control form-control-sm fs-4 mt-2"
+                    placeholder="選擇或輸入金額"
+                    list="special-prize-amount-list">
+                  <datalist id="special-prize-amount-list" style="display:none; position:absolute; z-index:999;"></datalist>
 
                 <div id="special-prize-dropdown2" class="dropdown-menu" style="display:none; position:absolute; z-index:999;"></div>
                 <datalist id="special-prize-list"></datalist>
@@ -98,8 +101,8 @@
                 <div class="col-12 m-0">
                   <div class="d-flex justify-content-between mb-3 text-light fw-bold">
                     <div class="flex-fill">部門</div>
-                    <div class="flex-fill">姓</div>
-                    <div class="flex-fill">名字</div>
+                    <div class="flex-fill">工號</div>
+                    <div class="flex-fill">姓名</div>
                   </div>
                 </div>
 

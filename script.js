@@ -14,7 +14,9 @@ const specialPrizeContainer = document.querySelector('#special-prize-container')
 const specialPrizeInput = document.querySelector('#special-prize-input');
 const specialPrizeInput2 = document.querySelector('#special-prize-input2');
 const specialPrizeDropdown2  = document.querySelector('#special-prize-dropdown2');
-const specialPrizeAmountSelect = document.querySelector('#special-prize-amount-select');
+const specialPrizeAmountInput = document.querySelector('#special-prize-amount-input');
+const specialPrizeAmountList = document.querySelector('#special-prize-amount-list');
+
 
 
 const winnerLists = [
@@ -36,6 +38,19 @@ document.addEventListener('click', e => {
     document.getElementById('winner-dropdown').style.display = "none";
   }
 });
+
+
+// 1~8獎的固定金額
+const prizeAmounts = {
+  1: 35000,
+  2: 34300,
+  3: 32585,
+  4: 30956,
+  5: 23585,
+  6: 15091,
+  7: 8300,
+  8: 3735
+};
 
 
 
@@ -79,23 +94,14 @@ document.querySelectorAll('#file-input').forEach(input => {
       const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
       allNames = json.slice(1).map(row => {
-        const dept = row[0]?.trim();
-        const name = row[1]?.trim();
-        if (!dept || !name) return null;
+        const dept = row[0] != null ? String(row[0]).trim() : '';
+        const id = row[1] != null ? String(row[1]).trim() : '';
+        const name = row[2] != null ? String(row[2]).trim() : '';
 
-        let firstPart = '', restPart = '';
-        if (name.length >= 4)
-          firstPart = name.slice(0, 2),
-            restPart = name.slice(-2);
-        else if (name.length === 3)
-          firstPart = name.charAt(0),
-            restPart = name.slice(1);
-        else firstPart = name.charAt(0),
-          restPart = name.slice(1);
-        return {
-          dept, firstPart, restPart
-        };
+        if (!dept || !name) return null;  // 只檢查部門和姓名
+        return { dept, id, name };
       }).filter(Boolean);
+
 
       populateReels();
       startAutoScroll();
@@ -119,15 +125,15 @@ document.querySelector('#export-btn').addEventListener('click', () => {
 
   //轉成Excel
   const wsData = winnerData.map(w => [
+    `${w.dept} - ${w.name}`,
     w.prize,
-    w.bonus,
+    w.bonusSource,
+    w.prizeAmounts,
     w.specialBonus,
-    w.dept,
-    w.name,
   ]);
 
   //加標題列
-  const ws = XLSX.utils.aoa_to_sheet([['獎項名稱', '加碼人', '額外加碼','中獎人部門', '中獎人姓名']].concat(wsData));
+  const ws = XLSX.utils.aoa_to_sheet([['中獎人','獎項', '中獎來源','公司提供金額', '加碼金額','加碼來源','轉出金額']].concat(wsData));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '中獎名單');
 
@@ -140,24 +146,27 @@ function populateReels() {
   reels.forEach(r => {
     r.el.innerHTML = '';
     r.items = [];
-    r.mapIndex = []; // 新增對應表
+    r.mapIndex = [];
   });
 
-  const minItems = 12;
-  let displayNames = [...allNames];
-  while (displayNames.length < minItems) {
-    displayNames = displayNames.concat(allNames);
+  const displayCount = Math.min(allNames.length, 20); // 限制初始顯示筆數
+  for (let i = 0; i < displayCount; i++) {
+    appendReelItems(i);
   };
-
-  displayNames.forEach(({ dept, firstPart, restPart }, displayIdx) => {
-    [dept, firstPart, restPart].forEach((val, i) => {
+};
+//滾輪items
+function appendReelItems(startIndex) {
+  reels.forEach((r, reelIndex) => {
+    for (let i = startIndex; i < startIndex + 20 && i < allNames.length; i++) {
+      const p = allNames[i];
+      let val = reelIndex === 0 ? p.dept : reelIndex === 1 ? p.id : p.name;
       const div = document.createElement('div');
       div.className = 'symbol';
       div.textContent = val;
-      reels[i].el.appendChild(div);
-      reels[i].items.push(div);
-      reels[i].mapIndex.push(displayIdx % allNames.length);
-    });
+      r.el.appendChild(div);
+      r.items.push(div);
+      r.mapIndex.push(i); // 對應 allNames 索引
+    };
   });
 };
 
@@ -165,21 +174,8 @@ function ensureReelLoop(reel, reelIndex) {
   const viewportHeight = document.querySelector('.scroll-viewport').offsetHeight;
   const threshold = ITEM_HEIGHT * 3; // 提前3筆追加
   if (reel.position + viewportHeight > reel.items.length * ITEM_HEIGHT - threshold) {
-    // 追加一輪名單，但只加對應軸的值
-    allNames.forEach((nameObj, idx) => {
-      let val = '';
-      if (reelIndex === 0) val = nameObj.dept;
-      else if (reelIndex === 1) val = nameObj.firstPart;
-      else if (reelIndex === 2) val = nameObj.restPart;
-
-      const div = document.createElement('div');
-      div.className = 'symbol';
-      div.textContent = val;
-      reel.el.appendChild(div);
-      reel.items.push(div);
-      reel.mapIndex.push(idx); // 正確對應原始索引
-    });
-  }
+    appendReelItems(reel.items.length);
+  };
 };
 
 
@@ -223,19 +219,19 @@ dropdownItems.forEach(item => {
     const value = item.dataset.value;
     prizeText.textContent = item.textContent;
     dropdownButton.dataset.value = value;
-    specialPrizeAmountSelect.value = '';
+    specialPrizeAmountList.value = '';
     specialPrizeInput.value = '';
     specialPrizeInput2.value = '';
     if (value === "9") {
       specialPrizeContainer.style.display = "block";
       specialPrizeInput.style.display = "inline-block";
       specialPrizeInput2.style.display = "none";
-      specialPrizeAmountSelect.style.display = "none";
+      specialPrizeAmountInput.style.display = "none";
     } else if (value === "10"){
       specialPrizeContainer.style.display = "block";
       specialPrizeInput2.style.display = "inline-block";
       specialPrizeInput.style.display = "none";
-      specialPrizeAmountSelect.style.display = "block";
+      specialPrizeAmountInput.style.display = "block";
     } else {
       specialPrizeContainer.style.display = "none";
     };
@@ -296,8 +292,8 @@ function getFullRounds(prizeValue) {
 
 async function doDraw() {
   // **抽出還未中獎列表，用途，避免重覆中獎
-  const available = allNames.filter(p => !drawnWinners.has(`${p.dept}-${p.firstPart}${p.restPart}`));
-  if (available.length === 0) {
+  const available = allNames.filter(p => !drawnWinners.has(`${p.dept}-${p.name}`));
+  if (!available.length) {
     alert("所有人都已中獎！");
     return;
   };
@@ -315,34 +311,28 @@ async function doDraw() {
   const winner = available[Math.floor(Math.random() * available.length)];
 
   // **紀錄中獎者避免重複抽到
-  drawnWinners.add(`${winner.dept}-${winner.firstPart}${winner.restPart}`);
+  drawnWinners.add(`${winner.dept}-${winner.name}`);
 
   // 原始名單索引
-  const winnerIndex = allNames.findIndex(p =>
-    p.dept === winner.dept && p.firstPart === winner.firstPart && p.restPart === winner.restPart
-  );
+  const winnerIndex = allNames.findIndex(p => p.dept === winner.dept && p.name === winner.name);
 
   // 每軸對應 reel.items 的索引
-  const reelTargetIndexes = reels.map((r, i) => {
-    // 找出第二輪的 target 元素
-    const idxs = r.mapIndex
-      .map((v, index) => ({ v, index }))
-      .filter(x => x.v === winnerIndex);
-    return idxs.length > 1 ? idxs[1].index : idxs[0].index; // 第二輪
-  });
+  const reelTargetIndexes = reels.map(r => winnerIndex);
   const prizeValue = parseInt(dropdownButton.dataset.value) || 1;
   const fullRounds = getFullRounds(prizeValue);
 
-  const baseDuration = 800;
-  const durationPerRound = 200;
-
   const reelDurations = [
-    baseDuration + fullRounds * durationPerRound,
-    baseDuration + fullRounds * durationPerRound + 3000,
-    baseDuration + fullRounds * durationPerRound + 6000
+    800 + fullRounds * 200,
+    800 + fullRounds * 200 + 3000,
+    800 + fullRounds * 200 + 6000
   ];
 
   if (dropdownButton.dataset.value === "1") {
+    const totalTime = 10000; // 10秒總時長
+    const midAnimationTime = 1000; // 中間動畫 1 秒
+    const firstHalfTime = 3500; // 第一段滾輪 3.5 秒
+    const secondHalfTime = totalTime - midAnimationTime - firstHalfTime; // 第二段滾輪剩下 5.5 秒
+
     // 獎項1：分兩段滾輪 + 中間暫停動畫
     const halfRounds = Math.floor(fullRounds / 2);
 
@@ -350,20 +340,17 @@ async function doDraw() {
     const preTargetIndexes = reels.map((r, i) => {
       const target = reelTargetIndexes[i];
       const fullLength = r.mapIndex.length;
-
-      // 第一段滾輪至少跑一圈，保護不越界
-      const safeIdx = (target - 3 + fullLength) % fullLength;
-      return safeIdx;
+      return (target - 3 + fullLength) % fullLength;
     });
 
-    await Promise.all([
-      spinReel(reels[0], preTargetIndexes[0], reelDurations[0] / 2, 0, halfRounds),
-      spinReel(reels[1], preTargetIndexes[1], reelDurations[1] / 2, 0, halfRounds),
-      spinReel(reels[2], preTargetIndexes[2], reelDurations[2] / 2, 0, halfRounds)
-    ]);
+      await Promise.all([
+        spinReel(reels[0], preTargetIndexes[0], firstHalfTime, 0, halfRounds),
+        spinReel(reels[1], preTargetIndexes[1], firstHalfTime, 0, halfRounds),
+        spinReel(reels[2], preTargetIndexes[2], firstHalfTime, 0, halfRounds)
+      ]);
 
     // 暫停 + 動畫（你的淡出/彈入/空白邏輯）
-    await freezeMidAnimation();
+    await freezeMidAnimation(2000);
 
     // 第二段滾輪：分別啟動，每軸帶入小 delay 以產生依序停的感覺
     const p0 = spinReel(reels[0], reelTargetIndexes[0], reelDurations[0] / 2, 0, fullRounds - halfRounds)
@@ -394,8 +381,8 @@ async function doDraw() {
       startAutoScroll();
       isConfirming = false;
       // 隱藏手動畫
-      const hand = document.getElementById('hand-animation-container');
-      hand.style.display = 'none';
+      // const hand = document.getElementById('hand-animation-container');
+      // hand.style.display = 'none';
       // handAnim.stop();
     }, 4000);
   } else {
@@ -459,10 +446,10 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
         if (t < 1) {
           requestAnimationFrame(animate);
         } else {
-          let finalPos = ((targetPos % totalHeight) + totalHeight) % totalHeight;
-          reel.position = finalPos;
-          reel.el.style.transform = `translateY(-${finalPos}px)`;
-          resolve();
+            const finalPos = ((targetPos % totalHeight) + totalHeight) % totalHeight;
+            reel.position = finalPos;
+            reel.el.style.transform = `translateY(-${finalPos}px)`;
+            resolve();
         };
       };
       requestAnimationFrame(animate);
@@ -500,8 +487,8 @@ function handleWinnerText(winner) {
 
   const prizeValue = dropdownButton.dataset.value;
   const prizeName = prizeText.textContent;
-  let displayText = `${prizeName}：${winner.dept}-${winner.firstPart}${winner.restPart}`;
-  let specialText = `${winner.dept}-${winner.firstPart}${winner.restPart}`;
+  let displayText = `${prizeName}：${winner.dept} - ${winner.id} - ${winner.name}`;
+  let specialText = `${winner.dept}-${winner.name}`;
   let bonusText = "";
   let specialBonusText = "";
 
@@ -516,7 +503,7 @@ function handleWinnerText(winner) {
   };
 
   const li = document.createElement('li');
-    li.dataset.key = `${winner.dept}-${winner.firstPart}${winner.restPart}`;
+    li.dataset.key = `${winner.dept}-${winner.name}`;
 
   // 判斷是否幸運分享獎
   if (prizeValue  === "9") {
@@ -541,9 +528,11 @@ function handleWinnerText(winner) {
   // **加入 winnerData**
   winnerData.push({
     dept: winner.dept,
-    name: `${winner.firstPart}${winner.restPart}`,
+    id: winner.id,
+    name: winner.name,
     prize: prizeText.textContent,
-    bonus: bonusText,
+    bonusSource: bonusText,
+    prizeAmounts: prizeAmounts[prizeValue] || "",
     specialBonus: specialBonusText,
   });
 
@@ -622,14 +611,10 @@ function updateCounts() {
 
 //淡出彈入動畫
 
-async function playPrizeAnimation() {
+async function playPrizeAnimation(midTime = 1000) { // 傳入中間動畫時間
   const panel = document.querySelector('.animate__animated');
 
-  panel.classList.remove(
-    'animate__headShake',
-    'animate__flash',
-    'glitch-effect'
-  );
+  panel.classList.remove('animate__headShake', 'animate__flash', 'glitch-effect');
 
   function playAnimation(animName) {
     return new Promise(resolve => {
@@ -641,35 +626,30 @@ async function playPrizeAnimation() {
         resolve();
       }, { once: true });
     });
-  };
+  }
 
   const displayText = panel.textContent;
   panel.setAttribute('data-text', displayText);
 
-  panel.classList.remove('animate__headShake', 'animate__flash', 'glitch-tv');
- // 2.TV 故障效果（2 秒）
+  // glitch-tv 效果縮短
   panel.classList.add("glitch-tv");
-  await new Promise(resolve => setTimeout(resolve, 2000 + 3000)); // 2秒動畫 + 4秒停留
+  await new Promise(resolve => setTimeout(resolve, midTime)); 
   panel.classList.remove("glitch-tv");
 
-  // 3. 讓元素消失
+  // 縮短消失停留
   panel.style.visibility = 'hidden';
+  await new Promise(resolve => setTimeout(resolve, 500));
 
-  // 4. 停 4 秒
-  await new Promise(resolve => setTimeout(resolve, 4000));
-
-  // 5. 出現 + flash
   panel.style.visibility = '';
   await playAnimation('animate__flash');
 };
 
-
-//凍結特效+淡出彈入動畫
-async function freezeMidAnimation() {
-  // 淡出動畫
-  await playPrizeAnimation(); // zoomOut + 3 秒停
+// 凍結特效 + 淡出彈入動畫
+async function freezeMidAnimation(midTime = 1000) {
+  await playPrizeAnimation(midTime);
   reels.forEach(r => r.el.style.transition = "");
 };
+
 
 // let handAnim = lottie.loadAnimation({
 //   container: document.getElementById('hand-animation-container'),
@@ -734,7 +714,7 @@ function populateSpecialPrizeList() {
   // 可以選 allNames 或 winnerData
   allNames.forEach(p => {
     const option = document.createElement('option');
-    option.value = `${p.dept} - ${p.firstPart}${p.restPart}`;
+    option.value = `${p.dept} - ${p.name}`;
     datalist.appendChild(option);
   });
 };
@@ -752,7 +732,7 @@ function populateSpecialPrizeList2() {
     };
 
     const filtered = allNames.filter(p => {
-      const fullName = `${p.dept} - ${p.firstPart}${p.restPart}`.toLowerCase();
+      const fullName = `${p.dept} - ${p.name}`.toLowerCase();
       return fullName.includes(keyword);
     });
 
@@ -764,7 +744,7 @@ function populateSpecialPrizeList2() {
     filtered.forEach(p => {
       const div = document.createElement('div');
       div.className = 'dropdown-item';
-      div.textContent = `${p.dept} - ${p.firstPart}${p.restPart}`;
+      div.textContent = `${p.dept} - ${p.name}`;
       div.style.cursor = 'pointer';
 
       div.addEventListener('click', () => {
@@ -795,23 +775,17 @@ populateSpecialPrizeList2();
 
 
 // 下拉金額
-function populateSpecialPrizeAmountSelect() {
+function populateSpecialPrizeAmountList() {
   const min = 2100;
   const max = 30000;
   const step = 500;
-
-  specialPrizeAmountSelect.innerHTML = '<option value="">請選擇金額</option>';
-
+  specialPrizeAmountList.innerHTML = '';
   for (let i = min; i <= max; i += step) {
     const option = document.createElement('option');
     option.value = i;
-    option.textContent = i.toLocaleString() + ' 元';
-    specialPrizeAmountSelect.appendChild(option);
+    // option.textContent = i.toLocaleString() + ' 元';
+    specialPrizeAmountList.appendChild(option);
   };
 };
-
-
-
-// 初始化呼叫
-populateSpecialPrizeAmountSelect();
+populateSpecialPrizeAmountList();
 
