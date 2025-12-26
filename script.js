@@ -130,6 +130,8 @@ document.querySelector('#export-btn').addEventListener('click', () => {
     w.bonusSource,
     w.prizeAmounts,
     w.specialBonus,
+    w.bonus2Source,
+    w.balance
   ]);
 
   //加標題列
@@ -487,18 +489,27 @@ function handleWinnerText(winner) {
 
   const prizeValue = dropdownButton.dataset.value;
   const prizeName = prizeText.textContent;
-  let displayText = `${prizeName}：${winner.dept} - ${winner.id} - ${winner.name}`;
-  let specialText = `${winner.dept}-${winner.name}`;
+  const companyPrizeAmount =
+  prizeAmounts[prizeValue]
+    ? `【金額${prizeAmounts[prizeValue].toLocaleString()} 元】`
+    : "";
+
+  let displayText = companyPrizeAmount
+  ? `${prizeName}${companyPrizeAmount}：`
+  : `${prizeName}`
+
+  let prizeAmountsText = `${winner.dept} - ${winner.name}`;
   let bonusText = "";
+  let bonus2Text = "";
   let specialBonusText = "";
 
   if (prizeValue === "9") {
     bonusText = specialPrizeInput.value?.trim() || "";
 
   } else if (prizeValue === "10") {
-    bonusText = specialPrizeInput2.value?.trim() || "";
-    specialBonusText = specialPrizeAmountSelect.value
-    ? `${specialPrizeAmountSelect.value}元`
+    bonus2Text = specialPrizeInput2.value?.trim() || "";
+    specialBonusText = specialPrizeAmountInput.value
+    ? `${specialPrizeAmountInput.value}元`
     : "";
   };
 
@@ -508,19 +519,19 @@ function handleWinnerText(winner) {
   // 判斷是否幸運分享獎
   if (prizeValue  === "9") {
     li.innerHTML = `
-      <p>幸運分享中獎人：${specialText}</p>
-      <p style="color:#D67158;">（分享來源人：${bonusText}加碼）</p>
+      <p>${displayText}【金額：${bonusText}】：${prizeAmountsText}</p>
+      <p style="color:#D67158;">（${bonusText}）</p>
       <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
   `;
   } else if (prizeValue === "10") {
     li.innerHTML = `
-      <p>現金加碼中獎人：${specialText}</p>
-      <p style="color:#D67158;">（加碼來源人：${bonusText}加碼：${specialBonusText}）</p>
+      <p>${displayText}【金額：${specialBonusText}】：${prizeAmountsText}</p>
+      <p style="color:#D67158;">【${bonus2Text}】</p>
       <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
   `;
   } else {
       li.innerHTML = `
-      <p>${displayText}</p>
+      <p>${displayText}${prizeAmountsText}</p>
       <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
     `;
   };
@@ -532,8 +543,9 @@ function handleWinnerText(winner) {
     name: winner.name,
     prize: prizeText.textContent,
     bonusSource: bonusText,
-    prizeAmounts: prizeAmounts[prizeValue] || "",
+    prizeAmounts: prizeAmounts[prizeValue] || 0,
     specialBonus: specialBonusText,
+    bonus2Source: bonus2Text
   });
 
   winnerLists.forEach(list => list.insertBefore(li.cloneNode(true), list.firstChild));
