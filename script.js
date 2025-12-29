@@ -531,6 +531,11 @@ function handleWinnerText(winner) {
       : "";
   };
 
+  let bonus9Value = Number(specialBalanceInput.value || 0);
+  let bonus10Value = Number(specialPrizeAmountInput.value || 0);
+  let specialBonusValue = bonus9Value || bonus10Value || 0;
+
+
   const companyPrizeAmount = companyPrizeValue
     ? `【金額：${companyPrizeValue.toLocaleString()}】`
     : "";
@@ -538,13 +543,23 @@ function handleWinnerText(winner) {
     ? `${prizeName}${companyPrizeAmount}：`
     : `${prizeName}`;
 
+  const specialBonusDisplay = specialBonusValue
+    ? ` + 現金加碼：${specialBonusValue.toLocaleString()}`
+    : "";
+
+  // li 顯示文字
+  const displayLine = companyPrizeValue
+    ? `【金額：${companyPrizeValue.toLocaleString()}${specialBonusDisplay}】`
+    : "";
+
+
   const li = document.createElement('li');
   li.dataset.key = `${winner.dept}-${winner.name}`;
 
   // 判斷是否幸運分享獎
   if (prizeValue === "9") {
     li.innerHTML = `
-      <p>${displayText}${prizeAmountsText}</p>
+      <p>${prizeName}${displayLine}：${prizeAmountsText}</p>
       <p style="color:#D67158;">【${bonusText}-幸運分享】</p>
       <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
     `;
@@ -580,7 +595,6 @@ function handleWinnerText(winner) {
   };
 
   // 統一處理加碼金額
-  let specialBonusValue = 0;
   const bonus9 = Number(specialBalanceInput.value || 0);
   const bonus10 = Number(specialPrizeAmountInput.value || 0);
   specialBonusValue = bonus9 || bonus10 || ""; // 有輸入哪個就用哪個，沒有就 0
