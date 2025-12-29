@@ -878,9 +878,9 @@ populateSpecialPrizeList2();
 
 // 下拉金額
 function populateSpecialPrizeAmountList() {
-  const min = 2100;
+  const min = 2000;
   const max = 30000;
-  const step = 500;
+  const step = 1000;
   specialPrizeAmountList.innerHTML = '';
   for (let i = min; i <= max; i += step) {
     const option = document.createElement('option');
