@@ -16,7 +16,8 @@ const specialPrizeInput2 = document.querySelector('#special-prize-input2');
 const specialPrizeDropdown2  = document.querySelector('#special-prize-dropdown2');
 const specialPrizeAmountInput = document.querySelector('#special-prize-amount-input');
 const specialPrizeAmountList = document.querySelector('#special-prize-amount-list');
-const specialPrizeInputs = document.querySelector('#special-prize-dable');
+const specialBalanceBtn = document.querySelector('#special-balance-btn');
+const specialBalanceInput = document.querySelector('#special-balance-input');
 
 
 const winnerLists = [
@@ -31,6 +32,13 @@ specialPrizeInput.addEventListener('focus', () => {
 specialPrizeInput.addEventListener('input', e => {
   filterWinnerDropdown(e.target.value);
 });
+
+specialBalanceBtn.addEventListener('click', () => {
+  // 顯示輸入框，隱藏按鈕
+  specialBalanceInput.style.display = 'block';
+  specialBalanceBtn.style.display = "none";
+});
+
 
 document.addEventListener('click', e => {
   if (!e.target.closest('#winner-dropdown') &&
@@ -244,20 +252,22 @@ dropdownItems.forEach(item => {
     specialPrizeInput.value = '';
     specialPrizeInput2.value = '';
     if (value === "9") {
+      specialBalanceInput.style.display = "none";
       specialPrizeContainer.style.display = "block";
       specialPrizeInput.style.display = "inline-block";
       specialPrizeInput2.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
-      specialPrizeInputs.style.display = "block";
+      specialBalanceBtn.style.display = "block";
     } else if (value === "10"){
+      specialBalanceInput.style.display = "none";
       specialPrizeContainer.style.display = "block";
       specialPrizeInput2.style.display = "inline-block";
       specialPrizeInput.style.display = "none";
-      specialPrizeInputs.style.display = "none";
+      specialBalanceBtn.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
     } else {
       specialPrizeContainer.style.display = "none";
-      specialPrizeInputs.style.display = "none";
+      specialBalanceBtn.style.display = "none";
     };
 
   });
@@ -569,6 +579,13 @@ function handleWinnerText(winner) {
     };
   };
 
+  // 統一處理加碼金額
+  let specialBonusValue = 0;
+  const bonus9 = Number(specialBalanceInput.value || 0);
+  const bonus10 = Number(specialPrizeAmountInput.value || 0);
+  specialBonusValue = bonus9 || bonus10 || ""; // 有輸入哪個就用哪個，沒有就 0
+
+
   // **加入 winnerData**
   winnerData.push({
     dept: winner.dept,
@@ -577,7 +594,7 @@ function handleWinnerText(winner) {
     prize: prizeText.textContent,
     bonusSource: bonusText,
     prizeAmounts: companyPrizeValue,
-    specialBonus: specialBonusText,
+    specialBonus: specialBonusValue,
     bonus2Source: bonus2Text,
     shareToId: shareId,
     shareAmount: isSharePrize ? Number(specialPrizeAmountInput.value || 0) : 0,
