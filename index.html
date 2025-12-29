@@ -36,7 +36,7 @@
               </button>
                 <ul class="dropdown-menu text-center">
                   <li>
-                    <a class="dropdown-item" href="#" data-value="1">頭獎</a>
+                    <a class="dropdown-item" href="#" data-value="1">頭獎(一名)</a>
                   </li>
                   <li>
                     <a class="dropdown-item" href="#" data-value="2">二獎</a>
@@ -83,15 +83,18 @@
                 style="display:none;"
                 list="special-prize-list"
                 placeholder="選擇加碼人">
-
                   <input type="number" id="special-prize-amount-input"
                     class="form-control form-control-sm fs-4 mt-2"
                     placeholder="選擇或輸入金額"
                     list="special-prize-amount-list">
                   <datalist id="special-prize-amount-list" style="display:none; position:absolute; z-index:999;"></datalist>
-
                 <div id="special-prize-dropdown2" class="dropdown-menu" style="display:none; position:absolute; z-index:999;"></div>
-                <datalist id="special-prize-list"></datalist>
+              <datalist id="special-prize-list"></datalist>
+              <input type="number"
+                id="special-prize-dable"
+                class="form-control form-control-sm fs-4 mt-2 w-50"
+                placeholder="額外加碼"
+                style="display:none; position:absolute; z-index:999;">
               </div>
             </div>
           </div>

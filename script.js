@@ -16,7 +16,7 @@ const specialPrizeInput2 = document.querySelector('#special-prize-input2');
 const specialPrizeDropdown2  = document.querySelector('#special-prize-dropdown2');
 const specialPrizeAmountInput = document.querySelector('#special-prize-amount-input');
 const specialPrizeAmountList = document.querySelector('#special-prize-amount-list');
-
+const specialPrizeInputs = document.querySelector('#special-prize-dable');
 
 
 const winnerLists = [
@@ -221,13 +221,16 @@ dropdownItems.forEach(item => {
       specialPrizeInput.style.display = "inline-block";
       specialPrizeInput2.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
+      specialPrizeInputs.style.display = "block";
     } else if (value === "10"){
       specialPrizeContainer.style.display = "block";
       specialPrizeInput2.style.display = "inline-block";
       specialPrizeInput.style.display = "none";
+      specialPrizeInputs.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
     } else {
       specialPrizeContainer.style.display = "none";
+      specialPrizeInputs.style.display = "none";
     };
 
   });
@@ -511,7 +514,7 @@ function handleWinnerText(winner) {
   } else if (prizeValue === "10") {
     bonus2Text = specialPrizeInput2.value?.trim() || "";
     specialBonusText = specialPrizeAmountInput.value
-    ? `${Number(specialPrizeAmountInput.value).toLocaleString()}元`
+    ? `${Number(specialPrizeAmountInput.value).toLocaleString()}`
     : "";
   };
   const companyPrizeAmount = companyPrizeValue
@@ -544,6 +547,18 @@ function handleWinnerText(winner) {
     `;
   };
 
+  let balanceValue = 0;
+  if (prizeValue === "9") {
+    const prevWinner = winnerData[winnerData.length - 1];
+
+    if (prevWinner) {
+      prevWinner.balance =
+        (prevWinner.balance || 0) +
+        Number(specialPrizeAmountInput.value || 0);
+    };
+  };
+
+
   // **加入 winnerData**
   winnerData.push({
     dept: winner.dept,
@@ -553,8 +568,10 @@ function handleWinnerText(winner) {
     bonusSource: bonusText,
     prizeAmounts: companyPrizeValue,
     specialBonus: specialBonusText,
-    bonus2Source: bonus2Text
+    bonus2Source: bonus2Text,
+    balance: balanceValue
   });
+
 
   winnerLists.forEach(list => list.insertBefore(li.cloneNode(true), list.firstChild));
 
@@ -802,7 +819,6 @@ function populateSpecialPrizeAmountList() {
   for (let i = min; i <= max; i += step) {
     const option = document.createElement('option');
     option.value = i;
-    // option.textContent = i.toLocaleString() + ' 元';
     specialPrizeAmountList.appendChild(option);
   };
 };
