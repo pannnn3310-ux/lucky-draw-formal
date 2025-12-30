@@ -83,7 +83,7 @@ ol, ul {
   border-right: none;
 }
 .slot .symbol.winner-highlight {
-  font-size: 1.8em;
+  font-size: 1.5em;
   font-weight: bold;
   background: rgba(208, 103, 87, 0.2);
 }
