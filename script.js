@@ -15,7 +15,6 @@ const specialPrizeInput = document.querySelector('#special-prize-input');
 const specialPrizeInput2 = document.querySelector('#special-prize-input2');
 const specialPrizeDropdown2  = document.querySelector('#special-prize-dropdown2');
 const specialPrizeAmountInput = document.querySelector('#special-prize-amount-input');
-const specialPrizeAmountList = document.querySelector('#special-prize-amount-list');
 const specialBalanceBtn = document.querySelector('#special-balance-btn');
 const specialBalanceInput = document.querySelector('#special-balance-input');
 
@@ -248,7 +247,6 @@ dropdownItems.forEach(item => {
     const value = item.dataset.value;
     prizeText.textContent = item.textContent;
     dropdownButton.dataset.value = value;
-    specialPrizeAmountList.value = '';
     specialPrizeInput.value = '';
     specialPrizeInput2.value = '';
     specialBalanceInput.value = '';
@@ -890,16 +888,3 @@ function populateSpecialPrizeList2() {
 populateSpecialPrizeList2();
 
 
-// 下拉金額
-function populateSpecialPrizeAmountList() {
-  const min = 2000;
-  const max = 30000;
-  const step = 1000;
-  specialPrizeAmountList.innerHTML = '';
-  for (let i = min; i <= max; i += step) {
-    const option = document.createElement('option');
-    option.value = i;
-    specialPrizeAmountList.appendChild(option);
-  };
-};
-populateSpecialPrizeAmountList();
