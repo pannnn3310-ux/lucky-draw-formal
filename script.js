@@ -2,7 +2,7 @@ let allNames = [];
 let winnerData = [];
 let drawnWinners = new Set();
 let isConfirming = false;
-
+let allNamesById = [];
 
 const scrollArea = document.querySelector('#scroll-area');
 const dropdownButton = document.querySelector('#prize-btn');
@@ -18,11 +18,11 @@ const specialPrizeAmountInput = document.querySelector('#special-prize-amount-in
 const specialBalanceBtn = document.querySelector('#special-balance-btn');
 const specialBalanceInput = document.querySelector('#special-balance-input');
 
-
 const winnerLists = [
   document.querySelector('#winner-list'),
   document.querySelector('#winner-list-mobile')
 ];
+
 
 specialPrizeInput.addEventListener('focus', () => {
   buildWinnerDropdown(specialPrizeInput);
@@ -97,6 +97,10 @@ document.querySelectorAll('#file-input').forEach(input => {
         if (!dept || !name) return null;  // 只檢查部門和姓名
         return { dept, id, name };
       }).filter(Boolean);
+
+      allNamesById = [...allNames].sort((a, b) => {
+        return Number(a.id) - Number(b.id);
+      });
 
 
       populateReels();
@@ -839,14 +843,14 @@ function populateSpecialPrizeList() {
 
 
   // 可以選 allNames 或 winnerData
-  allNames.forEach(p => {
+  allNamesById.forEach(p => {
     const option = document.createElement('option');
     option.value = `${p.id} - ${p.name}`;
     datalist.appendChild(option);
   });
 };
 
-
+//現金追加匯入
 function populateSpecialPrizeList2() {
   specialPrizeInput2.addEventListener('input', () => {
     const keyword = specialPrizeInput2.value.trim().toLowerCase();
