@@ -580,10 +580,16 @@ function handleWinnerText(winner) {
   li.dataset.key = `${winner.dept}-${winner.name}`;
 
   // 判斷是否幸運分享獎
-  if (prizeValue === "9" || prizeValue === "11") {
+  if (prizeValue === "9") {
     li.innerHTML = `
       <p>${prizeName}${displayLine}：${prizeAmountsText}</p>
       <p style="color:#D67158;">【${bonusText}-幸運分享】</p>
+      <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
+    `;
+  } else if (prizeValue === "11") {
+        li.innerHTML = `
+      <p>${prizeName}${displayLine}：${prizeAmountsText}</p>
+      <p style="color:#D67158;">【${bonusText}-額外加碼】</p>
       <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
     `;
   } else if (prizeValue === "10") {
@@ -614,7 +620,7 @@ function handleWinnerText(winner) {
       const addAmount = Number(specialPrizeAmountInput.value || 0);
       target.balance = (target.balance || 0) + addAmount;
     } else {
-      console.warn("找不到被分享的中獎人:", shareName);
+      shareId = `extra-${Date.now()}`;
     };
   };
 
