@@ -272,7 +272,7 @@ dropdownItems.forEach(item => {
     } else if (value === "11") {  // 額外加碼獎
       specialBalanceInput.style.display = "none";
       specialPrizeContainer.style.display = "block";
-      specialPrizeInput.style.display = "inline-block"; // 跟獎項9一樣
+      specialPrizeInput.style.display = "none";
       specialPrizeInput2.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
       specialBalanceBtn.style.display = "block";
@@ -602,7 +602,6 @@ function handleWinnerText(winner) {
   } else if (prizeValue === "11") {
         li.innerHTML = `
       <p>${prizeName}${displayLine}：${prizeAmountsText}</p>
-      <p style="color:#D67158;">【${bonusText}-額外加碼】</p>
       <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
     `;
   } else if (prizeValue === "10") {
