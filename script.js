@@ -265,6 +265,13 @@ dropdownItems.forEach(item => {
       specialPrizeInput.style.display = "none";
       specialBalanceBtn.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
+    } else if (value === "11") {  // 額外加碼獎
+      specialBalanceInput.style.display = "none";
+      specialPrizeContainer.style.display = "block";
+      specialPrizeInput.style.display = "inline-block"; // 跟獎項9一樣
+      specialPrizeInput2.style.display = "none";
+      specialPrizeAmountInput.style.display = "block";
+      specialBalanceBtn.style.display = "block";
     } else {
       specialPrizeContainer.style.display = "none";
       specialBalanceBtn.style.display = "none";
@@ -527,8 +534,8 @@ function handleWinnerText(winner) {
   const bonus10Value = Number(specialPrizeAmountInput.value || 0);
 
 
-  if (prizeValue === "9") {
-    specialBonusValue = bonus9Value > 0 ? bonus9Value : "";
+  if (prizeValue === "9" || prizeValue === "11") {  // 11 與 9 一樣處理
+    specialBonusValue = (Number(specialBalanceInput.value) || 0);
     bonusText = specialPrizeInput.value?.trim() || "";
     companyPrizeValue = Number(specialPrizeAmountInput.value) || 0;
   } else if (prizeValue === "10") {
@@ -573,7 +580,7 @@ function handleWinnerText(winner) {
   li.dataset.key = `${winner.dept}-${winner.name}`;
 
   // 判斷是否幸運分享獎
-  if (prizeValue === "9") {
+  if (prizeValue === "9" || prizeValue === "11") {
     li.innerHTML = `
       <p>${prizeName}${displayLine}：${prizeAmountsText}</p>
       <p style="color:#D67158;">【${bonusText}-幸運分享】</p>
@@ -592,7 +599,8 @@ function handleWinnerText(winner) {
     `;
   };
 
-  const isSharePrize = prizeValue === "9";
+  const isSharePrize = prizeValue === "9" || prizeValue === "11";
+
   let shareId = null;
 
   if (isSharePrize && bonusText) {
