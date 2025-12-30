@@ -345,11 +345,20 @@ async function doDraw() {
   const prizeValue = parseInt(dropdownButton.dataset.value) || 1;
   const fullRounds = getFullRounds(prizeValue);
 
-  const reelDurations = [
-    800 + fullRounds * 200,
-    800 + fullRounds * 200 + 3000,
-    800 + fullRounds * 200 + 6000
-  ];
+  const noDelayPrizes = [7, 8];
+
+  let reelDurations;
+
+  if (noDelayPrizes.includes(prizeValue)) {
+    const baseDuration = 800 + fullRounds * 200;
+    reelDurations = [baseDuration, baseDuration, baseDuration];
+  } else {
+    reelDurations = [
+      800 + fullRounds * 200,
+      800 + fullRounds * 200 + 3000,
+      800 + fullRounds * 200 + 6000
+    ];
+  };
 
   const viewportHeight = document.querySelector('.scroll-viewport').offsetHeight;
   const centerOffset = (viewportHeight / 2) - (ITEM_HEIGHT / 2);
