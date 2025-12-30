@@ -251,6 +251,8 @@ dropdownItems.forEach(item => {
     specialPrizeAmountList.value = '';
     specialPrizeInput.value = '';
     specialPrizeInput2.value = '';
+    specialBalanceInput.value = '';
+    specialPrizeAmountInput.value = '';
     if (value === "9") {
       specialBalanceInput.style.display = "none";
       specialPrizeContainer.style.display = "block";
@@ -520,20 +522,36 @@ function handleWinnerText(winner) {
   let bonusText = "";
   let bonus2Text = "";
   let specialBonusText = "";
+  let specialBonusValue = "";
+
+
+  const bonus9Value  = Number(specialBalanceInput.value || 0);
+  const bonus10Value = Number(specialPrizeAmountInput.value || 0);
+
 
   if (prizeValue === "9") {
+    specialBonusValue = bonus9Value > 0 ? bonus9Value : "";
     bonusText = specialPrizeInput.value?.trim() || "";
     companyPrizeValue = Number(specialPrizeAmountInput.value) || 0;
   } else if (prizeValue === "10") {
-    bonus2Text = specialPrizeInput2.value?.trim() || "";
+    specialBonusValue = bonus10Value > 0 ? bonus10Value : 0;
+
+    // 從輸入值取得工號
+    const inputParts = specialPrizeInput2.value?.trim().split(" - ") || [];
+    const selectedId = inputParts[0];
+
+    // 找到對應的部門與姓名
+    const selectedPerson = allNames.find(p => p.id === selectedId);
+
+    bonus2Text = selectedPerson
+      ? `${selectedPerson.dept} - ${selectedPerson.name}`
+      : specialPrizeInput2.value; // 找不到就維持原本文字
+
     specialBonusText = specialPrizeAmountInput.value
       ? `${Number(specialPrizeAmountInput.value).toLocaleString()}`
       : "";
   };
 
-  let bonus9Value = Number(specialBalanceInput.value || 0);
-  let bonus10Value = Number(specialPrizeAmountInput.value || 0);
-  let specialBonusValue = bonus9Value || bonus10Value || 0;
 
 
   const companyPrizeAmount = companyPrizeValue
@@ -594,10 +612,6 @@ function handleWinnerText(winner) {
     };
   };
 
-  // 統一處理加碼金額
-  const bonus9 = Number(specialBalanceInput.value || 0);
-  const bonus10 = Number(specialPrizeAmountInput.value || 0);
-  specialBonusValue = bonus9 || bonus10 || ""; // 有輸入哪個就用哪個，沒有就 0
 
 
   // **加入 winnerData**
@@ -815,7 +829,7 @@ function populateSpecialPrizeList() {
   // 可以選 allNames 或 winnerData
   allNames.forEach(p => {
     const option = document.createElement('option');
-    option.value = `${p.dept} - ${p.name}`;
+    option.value = `${p.id} - ${p.name}`;
     datalist.appendChild(option);
   });
 };
