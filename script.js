@@ -959,20 +959,32 @@ function saveState() {
     winnerData = JSON.parse(savedWinners);
     drawnWinners = new Set(JSON.parse(savedDrawn));
 
-    // 還原畫面
-    winnerData.forEach(w => {
+    // 清空現有畫面
+    winnerLists.forEach(list => list.innerHTML = '');
+
+    // 重新建立 li
+    for (let i = winnerData.length - 1; i >= 0; i--) {
+      const w = winnerData[i];
       const li = document.createElement('li');
       li.dataset.key = `${w.dept}-${w.name}`;
 
+      let displayLine = '';
+      if (w.prizeAmounts || w.specialBonus) {
+        displayLine = `【金額：${(w.prizeAmounts || 0).toLocaleString()}${w.specialBonus ? ' + 現金加碼：' + w.specialBonus.toLocaleString() : ''}】`;
+      };
+
+      let bonusLine = '';
+      if (w.bonusSource) bonusLine = `<p style="color:#D67158;">【${w.bonusSource}-幸運分享】</p>`;
+      else if (w.bonus2Source) bonusLine = `<p style="color:#D67158;">【${w.bonus2Source}】</p>`;
+
       li.innerHTML = `
-        <p>${w.prize}：${w.dept} - ${w.name}</p>
+        <p>${w.prize}${displayLine}：${w.dept} - ${w.name}</p>
+        ${bonusLine}
         <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
       `;
 
-      winnerLists.forEach(list =>
-        list.insertBefore(li.cloneNode(true), list.firstChild)
-      );
-    });
+      winnerLists.forEach(list => list.appendChild(li.cloneNode(true)));
+    }
 
     updateCounts();
   } catch (e) {
@@ -980,6 +992,7 @@ function saveState() {
     localStorage.clear();
   }
 })();
+
 
 //刪除歷史紀錄
 
