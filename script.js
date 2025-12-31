@@ -350,8 +350,11 @@ async function doDraw() {
   let reelDurations;
 
   if (noDelayPrizes.includes(prizeValue)) {
-    const baseDuration = 800 + fullRounds * 200;
-    reelDurations = [baseDuration, baseDuration, baseDuration];
+    reelDurations = [
+      800 + fullRounds * 200,
+      800 + fullRounds * 200 + 300,
+      800 + fullRounds * 200 + 800
+    ];
   } else {
     reelDurations = [
       800 + fullRounds * 200,
@@ -431,7 +434,7 @@ async function doDraw() {
         }, 4000);
       });
   };
-}
+};
 
 
 function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3) {
