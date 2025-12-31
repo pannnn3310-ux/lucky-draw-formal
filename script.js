@@ -464,7 +464,7 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
       const viewportHeight = document.querySelector('.scroll-viewport').offsetHeight;
       const centerOffset = (viewportHeight / 2) - (ITEM_HEIGHT / 2);
 
-      // ⭐ 找「最接近中間輪次」的 target，而不是最後一個
+      // 找最接近中間輪次的 target，而不是最後一個
       const totalItems = reel.mapIndex.length;
       let reelTargetItemIndex = null;
       for (let i = 0; i < totalItems; i++) {
@@ -482,15 +482,15 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
           if (reel.mapIndex[i] === targetIndex) {
             reelTargetItemIndex = i;
             break;
-          }
-        }
-      }
+          };
+        };
+      };
 
       const targetPos = reelTargetItemIndex * ITEM_HEIGHT;
 
       function easeOutQuad(t) {
         return t * (2 - t);
-      }
+      };
 
       function animate(now) {
         let t = (now - startTime) / duration;
@@ -514,13 +514,13 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
           reel.position = finalTransform; // ⭐ 同步更新 reel.position
           reel.finalItemIndex = reelTargetItemIndex;
           resolve();
-        }
-      }
+        };
+      };
 
       requestAnimationFrame(animate);
     }, delay);
   });
-}
+};
 
 
 
@@ -984,13 +984,13 @@ function saveState() {
       `;
 
       winnerLists.forEach(list => list.appendChild(li.cloneNode(true)));
-    }
+    };
 
     updateCounts();
   } catch (e) {
     console.error('還原失敗，清除舊資料', e);
     localStorage.clear();
-  }
+  };
 })();
 
 
@@ -1019,21 +1019,21 @@ clearAllBtn.addEventListener('click', () => {
     cleanup();
     confirmToast.hide();
 
-    // 1️⃣ 清除記憶資料
+    // 清除記憶資料
     winnerData = [];
     drawnWinners.clear();
 
-    // 2️⃣ 清空畫面
+    // 清空畫面
     winnerLists.forEach(list => list.innerHTML = '');
 
-    // 3️⃣ 清除 localStorage
+    // 清除 localStorage
     localStorage.removeItem('winnerData');
     localStorage.removeItem('drawnWinners');
 
-    // 4️⃣ 更新統計
+    //更新統計
     updateCounts();
 
-    // 5️⃣ 成功 Toast
+    //成功 Toast
     const successBody = document.getElementById("success-toast-body");
     successBody.innerHTML = `<p>已清除所有中獎名單</p>`;
     const successToastEl = document.getElementById("success-toast");
