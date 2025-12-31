@@ -17,6 +17,7 @@ const specialPrizeDropdown2  = document.querySelector('#special-prize-dropdown2'
 const specialPrizeAmountInput = document.querySelector('#special-prize-amount-input');
 const specialBalanceBtn = document.querySelector('#special-balance-btn');
 const specialBalanceInput = document.querySelector('#special-balance-input');
+const clearAllBtn = document.querySelector('#clear-all-btn');
 
 const winnerLists = [
   document.querySelector('#winner-list'),
@@ -678,6 +679,7 @@ function handleWinnerText(winner) {
 
   showWinnerEffect();
   updateCounts();
+  saveState();
 };
 
 
@@ -733,6 +735,8 @@ winnerLists.forEach(list => {
 
     // 從已中獎名單移除
     drawnWinners.delete(key);
+    //存檔
+    saveState();
 
     // 刪畫面
     li.remove();
@@ -754,6 +758,7 @@ winnerLists.forEach(list => {
       cleanup();
       confirmToast.hide();
     };
+
   });
 });
 
@@ -933,4 +938,99 @@ function populateSpecialPrizeList2() {
 // 初始化呼叫
 populateSpecialPrizeList2();
 
+
+//自動存檔
+
+function saveState() {
+  localStorage.setItem('winnerData', JSON.stringify(winnerData));
+  localStorage.setItem(
+    'drawnWinners',
+    JSON.stringify([...drawnWinners])
+  );
+};
+
+(function restoreState() {
+  const savedWinners = localStorage.getItem('winnerData');
+  const savedDrawn = localStorage.getItem('drawnWinners');
+
+  if (!savedWinners || !savedDrawn) return;
+
+  try {
+    winnerData = JSON.parse(savedWinners);
+    drawnWinners = new Set(JSON.parse(savedDrawn));
+
+    // 還原畫面
+    winnerData.forEach(w => {
+      const li = document.createElement('li');
+      li.dataset.key = `${w.dept}-${w.name}`;
+
+      li.innerHTML = `
+        <p>${w.prize}：${w.dept} - ${w.name}</p>
+        <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
+      `;
+
+      winnerLists.forEach(list =>
+        list.insertBefore(li.cloneNode(true), list.firstChild)
+      );
+    });
+
+    updateCounts();
+  } catch (e) {
+    console.error('還原失敗，清除舊資料', e);
+    localStorage.clear();
+  }
+})();
+
+//刪除歷史紀錄
+
+clearAllBtn.addEventListener('click', () => {
+  if (winnerData.length === 0) return;
+
+  // 顯示確認 toast
+  const confirmBody = document.querySelector('#confirm-toast-body');
+  confirmBody.innerHTML  = `<p>確定要移除所有歷史名單嗎？刪除後無法復原！</p>`;
+
+  const confirmToastEl = document.querySelector('#confirm-toast');
+  const confirmToast = new bootstrap.Toast(confirmToastEl);
+  confirmToast.show();
+
+  const yesBtn = document.querySelector('#confirm-yes');
+  const noBtn = document.querySelector('#confirm-no');
+
+  const cleanup = () => {
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+  };
+
+  yesBtn.onclick = () => {
+    cleanup();
+    confirmToast.hide();
+
+    // 1️⃣ 清除記憶資料
+    winnerData = [];
+    drawnWinners.clear();
+
+    // 2️⃣ 清空畫面
+    winnerLists.forEach(list => list.innerHTML = '');
+
+    // 3️⃣ 清除 localStorage
+    localStorage.removeItem('winnerData');
+    localStorage.removeItem('drawnWinners');
+
+    // 4️⃣ 更新統計
+    updateCounts();
+
+    // 5️⃣ 成功 Toast
+    const successBody = document.getElementById("success-toast-body");
+    successBody.innerHTML = `<p>已清除所有中獎名單</p>`;
+    const successToastEl = document.getElementById("success-toast");
+    const successToast = new bootstrap.Toast(successToastEl);
+    successToast.show();
+  };
+
+  noBtn.onclick = () => {
+    cleanup();
+    confirmToast.hide();
+  };
+});
 

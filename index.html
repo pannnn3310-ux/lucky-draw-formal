@@ -140,8 +140,11 @@
             <label class="text-light w-50">匯入名單（Excel）：
               <input type="file" id="file-input" accept=".xlsx" />
             </label>
-              <button id="export-btn" class="btn btn-light text-end">匯出中獎名單</button>
+            <div class="d-flex w-100 justify-content-between">
+              <button id="export-btn" class="btn btn-light">匯出名單</button>
               <div id="hand-animation-container"></div>
+              <button id="clear-all-btn" type="button" class="btn btn btn-danger">清除紀錄</button>
+            </div>
           </div>
           <div class="my-3 right-panel text-center">
             <h3>中獎名單</h3>
