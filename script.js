@@ -23,6 +23,23 @@ const winnerLists = [
   document.querySelector('#winner-list-mobile')
 ];
 
+let validateTimer = null;
+
+specialPrizeAmountInput.addEventListener('input', () => {
+  clearTimeout(validateTimer);
+
+  validateTimer = setTimeout(() => {
+    const value = Number(specialPrizeAmountInput.value);
+      if (value && value < 2000) {
+        specialPrizeAmountInput.focus();
+    specialPrizeAmountInput.classList.add('is-invalid');
+      } else {
+        specialPrizeAmountInput.classList.remove('is-invalid');
+      };
+  }, 500); // 停止輸入 0.5 秒後才驗證
+});
+
+
 
 specialPrizeInput.addEventListener('focus', () => {
   buildWinnerDropdown(specialPrizeInput);

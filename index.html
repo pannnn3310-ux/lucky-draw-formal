@@ -89,6 +89,8 @@
                   <input type="number" id="special-prize-amount-input"
                     class="form-control form-control-sm fs-4 mt-2"
                     placeholder="輸入金額，建議2000元以上"
+                    min="2000"
+                    step="500"
                     list="special-prize-amount-list">
                   <button type="button" id="special-balance-btn" class="btn btn-lg btn-light fs-4 mt-2"
                   style="display:none;"
@@ -200,6 +202,11 @@
       </div>
     </div>
   </div>
+
+  <div class="invalid-feedback fs-6">
+    金額需為 2000 元以上
+  </div>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
