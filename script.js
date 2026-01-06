@@ -18,6 +18,7 @@ const specialPrizeAmountInput = document.querySelector('#special-prize-amount-in
 const specialBalanceBtn = document.querySelector('#special-balance-btn');
 const specialBalanceInput = document.querySelector('#special-balance-input');
 const clearAllBtn = document.querySelector('#clear-all-btn');
+const stickChang = document.querySelector('.stick');
 
 const winnerLists = [
   document.querySelector('#winner-list'),
@@ -279,6 +280,7 @@ dropdownItems.forEach(item => {
       specialPrizeInput.style.display = "inline-block";
       specialPrizeInput2.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
+      stickChang.style.top = "20%";
       specialBalanceBtn.style.display = "block";
     } else if (value === "10"){
       specialBalanceInput.style.display = "none";
@@ -287,6 +289,7 @@ dropdownItems.forEach(item => {
       specialPrizeInput.style.display = "none";
       specialBalanceBtn.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
+      stickChang.style.top = "5%";
     } else if (value === "11") {  // 額外加碼獎
       specialBalanceInput.style.display = "none";
       specialPrizeContainer.style.display = "block";
@@ -294,9 +297,11 @@ dropdownItems.forEach(item => {
       specialPrizeInput2.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
       specialBalanceBtn.style.display = "block";
+      stickChang.style.top = "0.1%";
     } else {
       specialPrizeContainer.style.display = "none";
       specialBalanceBtn.style.display = "none";
+      stickChang.style.top = "5%";
     };
 
   });
