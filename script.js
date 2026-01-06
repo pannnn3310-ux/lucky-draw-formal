@@ -979,7 +979,7 @@ function saveState() {
       } else if (w.prizeAmounts) {
         displayLine = `【金額：${w.prizeAmounts.toLocaleString()}】`;
       } else if (w.specialBonus) {
-        displayLine = `【現金加碼：${w.specialBonus.toLocaleString()}】`;
+        displayLine = `【金額：${w.specialBonus.toLocaleString()}】`;
       };
 
       let bonusLine = '';
