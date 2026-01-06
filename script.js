@@ -974,8 +974,12 @@ function saveState() {
       li.dataset.key = `${w.dept}-${w.name}`;
 
       let displayLine = '';
-      if (w.prizeAmounts || w.specialBonus) {
-        displayLine = `【金額：${(w.prizeAmounts || 0).toLocaleString()}${w.specialBonus ? ' + 現金加碼：' + w.specialBonus.toLocaleString() : ''}】`;
+      if (w.prizeAmounts && w.specialBonus) {
+        displayLine = `【金額：${w.prizeAmounts.toLocaleString()} + 現金加碼：${w.specialBonus.toLocaleString()}】`;
+      } else if (w.prizeAmounts) {
+        displayLine = `【金額：${w.prizeAmounts.toLocaleString()}】`;
+      } else if (w.specialBonus) {
+        displayLine = `【現金加碼：${w.specialBonus.toLocaleString()}】`;
       };
 
       let bonusLine = '';
