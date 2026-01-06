@@ -158,16 +158,15 @@ ol, ul {
 
 .trigger-draw {
   position: absolute;
-  width: 40px;
-  height: 40px;
+  width: 70px;
+  height: 70px;
   top: -30px;
-  left: -14px;
+  left: -22px;
   background: transparent;
   border: none;
-  cursor: pointer;
   z-index: 2;
 }
-.trigger-draw :active {
+.trigger-draw:active {
   transform: translateY(4px);
 }
 
