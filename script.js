@@ -554,7 +554,49 @@ function showWinnerEffect() {
     confetti({ origin: { x: 0.1, y: 0.9 }, angle: 60, spread: 100, startVelocity: 45, particleCount: 200, scalar: 1.1, decay: 0.9 });
     confetti({ origin: { x: 0.9, y: 0.9 }, angle: 120, spread: 100, startVelocity: 45, particleCount: 200, scalar: 1.1, decay: 0.9 });
   };
+  if (dropdownButton.dataset.value === "1") {
+    [0.2, 0.4, 0.6, 0.8].forEach((x, i) => {
+      setTimeout(() => showFireworks(x), i * 220);
+    });
+  } else {
+    return;
+  };
 };
+
+//煙火特效
+function showFireworks(x = 0.5) {
+  // 🚀 上升火箭（拉長）
+  confetti({
+    particleCount: 36,
+    angle: 90,
+    spread: 6,
+    startVelocity: 95,
+    gravity: 0.32,
+    decay: 0.97,
+    ticks: 280,          // ⭐ 發射久
+    scalar: 0.55,        // 火箭稍大
+    colors: ['#FFD700'],
+    origin: { x, y: 1 }
+  });
+
+  // 🎆 爆炸（更大、停更久）
+  setTimeout(() => {
+    confetti({
+      particleCount: 220,
+      spread: 360,
+      startVelocity: 38,
+      gravity: 0.28,
+      decay: 0.97,
+      ticks: 380,        // ⭐ 停留久
+      scalar: 0.95,      // ⭐ 火花大
+      colors: ['#FFD700', '#FF4D4D', '#FFFFFF'],
+      origin: { x, y: 0.4 }
+    });
+  }, 620);
+};
+
+
+
 
 //整合中獎後續動作特效
 function handleWinnerText(winner) {
