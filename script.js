@@ -565,7 +565,7 @@ function showWinnerEffect() {
 
 //煙火特效
 function showFireworks(x = 0.5) {
-  // 🚀 上升火箭（拉長）
+  //上升
   confetti({
     particleCount: 36,
     angle: 90,
@@ -573,13 +573,13 @@ function showFireworks(x = 0.5) {
     startVelocity: 95,
     gravity: 0.32,
     decay: 0.97,
-    ticks: 280,          // ⭐ 發射久
-    scalar: 0.55,        // 火箭稍大
+    ticks: 280,
+    scalar: 0.55,
     colors: ['#FFD700'],
     origin: { x, y: 1 }
   });
 
-  // 🎆 爆炸（更大、停更久）
+  // 爆炸
   setTimeout(() => {
     confetti({
       particleCount: 220,
@@ -587,8 +587,8 @@ function showFireworks(x = 0.5) {
       startVelocity: 38,
       gravity: 0.28,
       decay: 0.97,
-      ticks: 380,        // ⭐ 停留久
-      scalar: 0.95,      // ⭐ 火花大
+      ticks: 380,
+      scalar: 0.95,
       colors: ['#FFD700', '#FF4D4D', '#FFFFFF'],
       origin: { x, y: 0.4 }
     });
