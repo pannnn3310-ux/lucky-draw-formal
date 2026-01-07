@@ -874,7 +874,7 @@ winnerLists.forEach(list => {
   // 成功 Toast
     const successBody = document.getElementById("success-toast-body");
     successBody.innerHTML =
-      `<p><span class="text-danger">${key}</span>已從中獎名單移除，可以再次抽到</p>`;
+      `<p class="m-0" <span class="text-danger">${key}</span>已從中獎名單移除，可以再次抽到</p>`;
 
     const successToastEl = document.getElementById("success-toast");
     const successToast = new bootstrap.Toast(successToastEl);
@@ -1171,7 +1171,7 @@ clearAllBtn.addEventListener('click', () => {
 
     //成功 Toast
     const successBody = document.getElementById("success-toast-body");
-    successBody.innerHTML = `<p>已清除所有中獎名單</p>`;
+    successBody.innerHTML = `<p class="m-0">已清除所有中獎名單</p>`;
     const successToastEl = document.getElementById("success-toast");
     const successToast = new bootstrap.Toast(successToastEl);
     successToast.show();
