@@ -135,7 +135,7 @@ document.querySelectorAll('#file-input').forEach(input => {
 document.querySelector('#export-btn').addEventListener('click', () => {
   if (winnerData.length === 0) {
     const listToast = document.querySelector('#list-toast-body');
-      listToast.textContent = `還沒有中獎名單可匯出！`;
+      listToast.innerHTML = `<p class="m-0">還沒有中獎名單可匯出！</p>`;
       const toastElement = document.querySelector('#list-toast');
       const toast = new bootstrap.Toast(toastElement);
       toast.show();
@@ -316,9 +316,8 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
 
     if (isConfirming) return;
     if (allNames.length === 0) {
-      // alert("請先匯入名單！");
       const listToast = document.querySelector('#list-toast-body');
-      listToast.textContent = `請先匯入抽獎名單！`;
+      listToast.innerHTML = `<p class="m-0">請先匯入抽獎名單！</p>`;
       const toastElement = document.querySelector('#list-toast');
       const toast = new bootstrap.Toast(toastElement);
       toast.show();
@@ -595,7 +594,83 @@ function showFireworks(x = 0.5) {
   }, 620);
 };
 
+function showShareExceedToast(remaining, shareAmount, exceed, onConfirm, onCancel) {
+  const toastEl = document.getElementById('confirm-toast');
+  const toastBody = document.getElementById('confirm-toast-body');
+  const btnYes = document.getElementById('confirm-yes');
+  const btnNo = document.getElementById('confirm-no');
 
+  // 設定訊息
+  toastBody.innerHTML = `
+    <div class="text-center">
+      <h2 class="fs-bold text-danger pb-2">分享金額已超過可分享上限！</h3>
+      <p>可分享金額剩餘：<span>${remaining.toLocaleString()}<span></p>
+      <p>目前輸入金額：<span>${shareAmount.toLocaleString()}</span></p>
+      <p>超出金額：<span class="text-danger pb-2 fw-bold">${exceed.toLocaleString()}</span></p>
+      <p class="text-center">是否要將<span class="text-danger pb-2 fw-bold">NT${exceed.toLocaleString()}</span>元改為現金加碼？</p>
+    </div>
+  `;
+
+  // 綁定按鈕事件
+  const cleanUp = () => {
+    btnYes.onclick = null;
+    btnNo.onclick = null;
+    const bsToast = bootstrap.Toast.getInstance(toastEl);
+    if (bsToast) bsToast.hide();
+  };
+
+  btnYes.onclick = () => { cleanUp(); onConfirm(); };
+  btnNo.onclick = () => { cleanUp(); onCancel(); };
+
+  // 顯示 Toast
+  const bsToast = new bootstrap.Toast(toastEl, { autohide: false });
+  bsToast.show();
+};
+
+
+//初始化監聽第九獎
+function bindShareAmountInput() {
+  specialPrizeAmountInput.addEventListener('input', () => {
+    const shareName = specialPrizeInput.value?.trim();
+    const shareAmount = Number(specialPrizeAmountInput.value || 0);
+
+    if (!shareName || shareAmount <= 0) return; // 沒輸入名字或金額就不檢查
+
+    const target = winnerData.find(w => `${w.dept} - ${w.name}` === shareName);
+    if (!target) return;
+
+    const originalAmount = target.prizeAmounts || 0;
+
+    // 已分享出去的總額
+    const usedShare = winnerData
+      .filter(w => w.shareToId === target.id)
+      .reduce((sum, w) => sum + (w.shareAmount || 0), 0);
+
+    const remaining = originalAmount - usedShare;
+
+    if (shareAmount > remaining) {
+      const exceed = shareAmount - remaining;
+
+      showShareExceedToast(
+      remaining,
+      shareAmount,
+      exceed,
+      () => { // 確認 -> 超出金額加到現金加碼
+        specialBalanceBtn.style.display = 'none';
+        specialBalanceInput.style.display = 'block';
+        specialBalanceInput.value = Number(specialBalanceInput.value || 0) + exceed;
+        specialPrizeAmountInput.value = remaining;
+      },
+      () => { // 取消 -> 限制輸入值
+        specialPrizeAmountInput.value = remaining;
+      }
+    );
+    };
+  });
+};
+
+// 初始化
+bindShareAmountInput();
 
 
 //整合中獎後續動作特效
@@ -685,7 +760,8 @@ function handleWinnerText(winner) {
     `;
   };
 
-  const isSharePrize = prizeValue === "9" || prizeValue === "11";
+  const isSharePrize = prizeValue === "9";
+
 
   let shareId = null;
 
@@ -742,7 +818,12 @@ winnerLists.forEach(list => {
 
     // ======== 啟動「刪除確認 Toast」 ========
     const confirmBody = document.querySelector('#confirm-toast-body');
-    confirmBody.innerHTML  = `<p>確定要移除<span class="text-danger">${key}</span>嗎？移除後會回到抽獎名單內。</p>`;
+    confirmBody.innerHTML  = `
+    <div class="text-center"
+      <p>確定要移除<span class="text-danger">${key}</span>嗎？</p>
+      <p>移除後會回到抽獎名單內。</p>
+    </div>`
+    ;
 
     const confirmToastEl = document.querySelector('#confirm-toast');
     const confirmToast = new bootstrap.Toast(confirmToastEl);
@@ -1052,7 +1133,11 @@ clearAllBtn.addEventListener('click', () => {
 
   // 顯示確認 toast
   const confirmBody = document.querySelector('#confirm-toast-body');
-  confirmBody.innerHTML  = `<p>確定要移除所有歷史名單嗎？刪除後無法復原！</p>`;
+  confirmBody.innerHTML  = `
+  <div class="text-center"
+    <p>確定要移除<span class="text-danger">所有歷史名單</span>嗎？</p>
+    <p>刪除後無法復原！</p>
+  </div>`;
 
   const confirmToastEl = document.querySelector('#confirm-toast');
   const confirmToast = new bootstrap.Toast(confirmToastEl);
