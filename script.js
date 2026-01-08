@@ -821,7 +821,7 @@ winnerLists.forEach(list => {
     const confirmBody = document.querySelector('#confirm-toast-body');
     confirmBody.innerHTML  = `
     <div class="text-center"
-      <p>確定要移除<span class="text-danger">${key}</span>嗎？</p>
+      <p>確定要移除<span class="text-danger">工號：${key}</span>嗎？</p>
       <p>移除後會回到抽獎名單內。</p>
     </div>`
     ;
@@ -875,7 +875,7 @@ winnerLists.forEach(list => {
   // 成功 Toast
     const successBody = document.querySelector('#success-toast-body');
     successBody.innerHTML =
-      `<p class="m-0" <span class="text-danger"工號：${key}</span>已從中獎名單移除，可以再次抽到</p>`;
+      `<p class="m-0" <span class="text-danger">工號：${key}</span>已從中獎名單移除，可以再次抽到</p>`;
 
     const successToastEl = document.querySelector('#success-toast');
     const successToast = new bootstrap.Toast(successToastEl);
