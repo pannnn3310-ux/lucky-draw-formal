@@ -63,7 +63,7 @@ document.addEventListener('click', e => {
   if (!e.target.closest('#winner-dropdown') &&
       e.target !== specialPrizeInput) {
     document.getElementById('winner-dropdown').style.display = "none";
-  }
+  };
 });
 
 
@@ -223,9 +223,8 @@ function populateReels() {
       r.el.appendChild(divAfter);
       r.items.push(divAfter);
       r.mapIndex.push(-1);
-    }
+    };
   });
-
 };
 
 
@@ -506,9 +505,9 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
           if (i * ITEM_HEIGHT >= startPos) {
             reelTargetItemIndex = i;
             break;
-          }
-        }
-      }
+          };
+        };
+      };
       // 如果沒找到，直接用最後一個
       if (reelTargetItemIndex === null) {
         for (let i = totalItems - 1; i >= 0; i--) {
@@ -541,10 +540,10 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
         if (t < 1) {
           requestAnimationFrame(animate);
         } else {
-          // ⭐ 最終強制對齊中心
+          //  最終強制對齊中心
           const finalTransform = targetPos - centerOffset;
           reel.el.style.transform = `translateY(-${finalTransform}px)`;
-          reel.position = finalTransform; // ⭐ 同步更新 reel.position
+          reel.position = finalTransform; // 同步更新 reel.position
           reel.finalItemIndex = reelTargetItemIndex;
           resolve();
         };
@@ -878,7 +877,7 @@ winnerLists.forEach(list => {
 
       const record = winnerData[index];
 
-      // ⭐ 如果刪的是「分享事件」，要回扣 balance
+      // 如果刪的是「分享事件」，要回扣 balance
       if (record.shareToId) {
         const target = winnerData.find(w => w.id === record.shareToId);
         if (target) {
@@ -930,8 +929,8 @@ function updateCounts() {
   document.querySelector('#remain-count').textContent = remain;
 };
 
-//淡出彈入動畫
 
+//淡出彈入動畫
 async function playPrizeAnimation(midTime = 1000) { // 傳入中間動畫時間
   const panel = document.querySelector('.animate__animated');
 
@@ -980,8 +979,8 @@ async function freezeMidAnimation(midTime = 1000) {
 //   path: './Artboard1.json'
 // });
 
-//中獎人選
 
+//中獎人選
 
 function buildWinnerDropdown(inputEl) {
   const dropdown = document.getElementById('winner-dropdown');
@@ -1223,4 +1222,4 @@ clearAllBtn.addEventListener('click', () => {
 
 function setStickOffset(px) {
   stickChang.style.transform = `translateY(calc(0% + ${px}px))`;
-}
+};
