@@ -104,6 +104,7 @@ ol, ul {
 .stick {
   position: relative;
   z-index: 15;
+  right: -2px;
   background-color: transparent;
   height: 300px;
 }
