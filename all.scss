@@ -13,12 +13,7 @@ ol, ul {
   overflow: hidden;
   min-height: 900px;
   padding: 0;
-  background-image:
-  linear-gradient(#751516, rgba(34, 34, 34, 0.46)),
-  url('Pngtree—japanese year of the horse_23201614.png');
-  background-repeat: no-repeat, no-repeat;
-  background-position: center, center;
-  background-size: cover;
+  overflow: hidden;
   background-color: #9A0F15;
 
   .container {
@@ -37,6 +32,18 @@ ol, ul {
     .overlay {
       background: rgba(90, 87, 87, 0.7);
     }
+  }
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image:
+    linear-gradient(#751516, rgba(34, 34, 34, 0.46)),
+    url('Pngtree—japanese year of the horse_23201614.png');
+    background-repeat: no-repeat, no-repeat;
+    background-position: center, center;
+    background-size: cover;
   }
 }
 
