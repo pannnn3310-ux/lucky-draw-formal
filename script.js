@@ -183,49 +183,69 @@ function getFullRounds(prizeValue) {
 
 function populateReels() {
   reels.forEach(r => {
-  r.el.innerHTML = '';
-  r.items = [];
-  r.mapIndex = [];
-});
+    r.el.innerHTML = '';
+    r.items = [];
+    r.mapIndex = [];
+  });
 
-  const minReelLength = 15; // 滾輪最少元素數，避免名單太少
+  const minReelLength = 15;
   const allLength = allNames.length;
 
-  // 計算需要補多少前後元素
+  // 若名單比最小長度短，計算需要補多少
   const padCount = Math.max(0, Math.floor((minReelLength - allLength) / 2));
 
+  // ===== 主名單 =====
   allNames.forEach((p, i) => {
     reels.forEach((r, reelIndex) => {
       const div = document.createElement('div');
       div.className = 'symbol';
-      div.textContent = reelIndex === 0 ? p.dept : reelIndex === 1 ? p.id : p.name;
+      div.textContent =
+        reelIndex === 0 ? p.dept :
+        reelIndex === 1 ? p.id :
+        p.name;
+
       r.el.appendChild(div);
       r.items.push(div);
-      r.mapIndex.push(i); // mapIndex 直接對應 allNames 索引
+      r.mapIndex.push(i);
     });
   });
 
-    //前後補元素，使第一筆/最後一筆也能對中
-  reels.forEach(r => {
-    for (let i = 0; i < padCount; i++) {
-      // 前補
-      const divBefore = document.createElement('div');
-      divBefore.className = 'symbol';
-      divBefore.textContent = '';
-      r.el.insertBefore(divBefore, r.el.firstChild);
-      r.items.unshift(divBefore);
-      r.mapIndex.unshift(-1);
 
-      // 後補
-      const divAfter = document.createElement('div');
-      divAfter.className = 'symbol';
-      divAfter.textContent = '';
-      r.el.appendChild(divAfter);
-      r.items.push(divAfter);
-      r.mapIndex.push(-1);
-    };
-  });
+  if (padCount > 0) {
+    reels.forEach((r, reelIndex) => {
+      for (let i = 0; i < padCount; i++) {
+        // 前補（從尾巴往前取）
+        const beforeIndex = (allLength - padCount + i) % allLength;
+        const beforePerson = allNames[beforeIndex];
+        const divBefore = document.createElement('div');
+        divBefore.className = 'symbol';
+        divBefore.textContent =
+          reelIndex === 0 ? beforePerson.dept :
+          reelIndex === 1 ? beforePerson.id :
+          beforePerson.name;
+
+        r.el.insertBefore(divBefore, r.el.firstChild);
+        r.items.unshift(divBefore);
+        r.mapIndex.unshift(beforeIndex);
+
+        // 後補
+        const afterIndex = i % allLength;
+        const afterPerson = allNames[afterIndex];
+        const divAfter = document.createElement('div');
+        divAfter.className = 'symbol';
+        divAfter.textContent =
+          reelIndex === 0 ? afterPerson.dept :
+          reelIndex === 1 ? afterPerson.id :
+          afterPerson.name;
+
+        r.el.appendChild(divAfter);
+        r.items.push(divAfter);
+        r.mapIndex.push(afterIndex);
+      };
+    });
+  };
 };
+
 
 
 function ensureReelLoop(reel, reelIndex) {
