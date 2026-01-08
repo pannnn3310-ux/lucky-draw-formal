@@ -4,6 +4,7 @@ let drawnWinners = new Set();
 let isConfirming = false;
 let allNamesById = [];
 
+const STORAGE_KEY = 'lucky-draw-formal_2026';
 const scrollArea = document.querySelector('#scroll-area');
 const dropdownButton = document.querySelector('#prize-btn');
 const prizeText = document.querySelector
@@ -342,7 +343,7 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
 
 async function doDraw() {
   // **抽出還未中獎列表，用途，避免重覆中獎
-  const available = allNames.filter(p => !drawnWinners.has(`${p.dept}-${p.name}`));
+  const available = allNames.filter(p => !drawnWinners.has(p.id));
   if (!available.length) {
     alert("所有人都已中獎！");
     return;
@@ -357,10 +358,10 @@ async function doDraw() {
   const winner = available[Math.floor(Math.random() * available.length)];
 
   // **紀錄中獎者避免重複抽到
-  drawnWinners.add(`${winner.dept}-${winner.name}`);
+  drawnWinners.add(winner.id);
 
   // 原始名單索引
-  const winnerIndex = allNames.findIndex(p => p.dept === winner.dept && p.name === winner.name);
+  const winnerIndex = allNames.findIndex(p => p.id === winner.id);
 
   // 每軸對應 reel.items 的索引
   const reelTargetIndexes = reels.map(r => winnerIndex);
@@ -631,19 +632,21 @@ function showShareExceedToast(remaining, shareAmount, exceed, onConfirm, onCance
 //初始化監聽第九獎
 function bindShareAmountInput() {
   specialPrizeAmountInput.addEventListener('input', () => {
-    const shareName = specialPrizeInput.value?.trim();
+    const prizeValue = dropdownButton.dataset.value; // 目前選的獎項
+    if (prizeValue !== "9") return; // 只對第九獎做判斷
+
+    const shareId = specialPrizeInput.dataset.id;
     const shareAmount = Number(specialPrizeAmountInput.value || 0);
 
-    if (!shareName || shareAmount <= 0) return; // 沒輸入名字或金額就不檢查
+    if (!shareId || shareAmount <= 0) return;
 
-    const target = winnerData.find(w => `${w.dept} - ${w.name}` === shareName);
+    const target = winnerData.find(w => w.id === shareId);
     if (!target) return;
 
     const originalAmount = target.prizeAmounts || 0;
 
-    // 已分享出去的總額
     const usedShare = winnerData
-      .filter(w => w.shareToId === target.id)
+      .filter(w => w.shareToId === shareId)
       .reduce((sum, w) => sum + (w.shareAmount || 0), 0);
 
     const remaining = originalAmount - usedShare;
@@ -652,19 +655,20 @@ function bindShareAmountInput() {
       const exceed = shareAmount - remaining;
 
       showShareExceedToast(
-      remaining,
-      shareAmount,
-      exceed,
-      () => { // 確認 -> 超出金額加到現金加碼
-        specialBalanceBtn.style.display = 'none';
-        specialBalanceInput.style.display = 'block';
-        specialBalanceInput.value = Number(specialBalanceInput.value || 0) + exceed;
-        specialPrizeAmountInput.value = remaining;
-      },
-      () => { // 取消 -> 限制輸入值
-        specialPrizeAmountInput.value = remaining;
-      }
-    );
+        remaining,
+        shareAmount,
+        exceed,
+        () => {
+          specialBalanceBtn.style.display = 'none';
+          specialBalanceInput.style.display = 'block';
+          specialBalanceInput.value =
+            Number(specialBalanceInput.value || 0) + exceed;
+          specialPrizeAmountInput.value = remaining;
+        },
+        () => {
+          specialPrizeAmountInput.value = remaining;
+        },
+      );
     };
   });
 };
@@ -733,7 +737,7 @@ function handleWinnerText(winner) {
 
 
   const li = document.createElement('li');
-  li.dataset.key = `${winner.dept}-${winner.name}`;
+  li.dataset.key = winner.id;
 
   // 判斷是否幸運分享獎
   if (prizeValue === "9") {
@@ -760,23 +764,20 @@ function handleWinnerText(winner) {
     `;
   };
 
-  const isSharePrize = prizeValue === "9";
+  const isSharePrize = prizeValue === "9"
 
+  const shareToId = isSharePrize
+  ? specialPrizeInput.dataset.id || null
+  : null;
 
-  let shareId = null;
-
-  if (isSharePrize && bonusText) {
+  if (isSharePrize && shareToId) {
     // 透過輸入值找到被分享的中獎人
-    const shareName = specialPrizeInput.value.trim();
-    const target = winnerData.find(
-      w => `${w.dept} - ${w.name}` === shareName
-    );
+    const target = winnerData.find(w => w.id === shareToId);
     if (target) {
-      shareId = target.id;
       const addAmount = Number(specialPrizeAmountInput.value || 0);
-      target.balance = (target.balance || 0) + addAmount;
+    target.balance = (target.balance || 0) + addAmount;
     } else {
-      shareId = `extra-${Date.now()}`;
+      shareToId = `extra-${Date.now()}`;
     };
   };
 
@@ -792,7 +793,7 @@ function handleWinnerText(winner) {
     prizeAmounts: companyPrizeValue,
     specialBonus: specialBonusValue,
     bonus2Source: bonus2Text,
-    shareToId: shareId,
+    shareToId,
     shareAmount: isSharePrize ? Number(specialPrizeAmountInput.value || 0) : 0,
     shareToIndex: isSharePrize ? winnerData.length - 1 : null,
     balance: 0
@@ -842,7 +843,7 @@ winnerLists.forEach(list => {
       confirmToast.hide();
 
       const index = winnerData.findIndex(
-        w => `${w.dept}-${w.name}` === key
+        w => w.id === key
       );
 
       if (index === -1) return;
@@ -862,7 +863,7 @@ winnerLists.forEach(list => {
     winnerData.splice(index, 1);
 
     // 從已中獎名單移除
-    drawnWinners.delete(key);
+    drawnWinners.delete(record.id);
     //存檔
     saveState();
 
@@ -872,11 +873,11 @@ winnerLists.forEach(list => {
     updateCounts();
 
   // 成功 Toast
-    const successBody = document.getElementById("success-toast-body");
+    const successBody = document.querySelector('#success-toast-body');
     successBody.innerHTML =
-      `<p class="m-0" <span class="text-danger">${key}</span>已從中獎名單移除，可以再次抽到</p>`;
+      `<p class="m-0" <span class="text-danger"工號：${key}</span>已從中獎名單移除，可以再次抽到</p>`;
 
-    const successToastEl = document.getElementById("success-toast");
+    const successToastEl = document.querySelector('#success-toast');
     const successToast = new bootstrap.Toast(successToastEl);
     successToast.show();
     };
@@ -971,6 +972,7 @@ function buildWinnerDropdown(inputEl) {
 
     btn.addEventListener('click', () => {
       inputEl.value = btn.textContent;
+      inputEl.dataset.id = w.id;
       dropdown.style.display = "none";
     });
 
@@ -1070,23 +1072,27 @@ populateSpecialPrizeList2();
 //自動存檔
 
 function saveState() {
-  localStorage.setItem('winnerData', JSON.stringify(winnerData));
   localStorage.setItem(
-    'drawnWinners',
+    `${STORAGE_KEY}_winnerData`,
+    JSON.stringify(winnerData)
+  );
+  localStorage.setItem(
+    `${STORAGE_KEY}_drawnWinners`,
     JSON.stringify([...drawnWinners])
   );
 };
 
 (function restoreState() {
-  const savedWinners = localStorage.getItem('winnerData');
-  const savedDrawn = localStorage.getItem('drawnWinners');
+  const savedWinners = localStorage.getItem(`${STORAGE_KEY}_winnerData`);
+  const savedDrawn = localStorage.getItem(`${STORAGE_KEY}_drawnWinners`);
+
 
   if (!savedWinners || !savedDrawn) return;
 
-  try {
-    winnerData = JSON.parse(savedWinners);
-    drawnWinners = new Set(JSON.parse(savedDrawn));
+  winnerData = JSON.parse(savedWinners);
+  drawnWinners = new Set(JSON.parse(savedDrawn));
 
+  try {
     // 清空現有畫面
     winnerLists.forEach(list => list.innerHTML = '');
 
@@ -1094,7 +1100,7 @@ function saveState() {
     for (let i = winnerData.length - 1; i >= 0; i--) {
       const w = winnerData[i];
       const li = document.createElement('li');
-      li.dataset.key = `${w.dept}-${w.name}`;
+      li.dataset.key = w.id;
 
       let displayLine = '';
       if (w.prizeAmounts && w.specialBonus) {
@@ -1120,10 +1126,12 @@ function saveState() {
 
     updateCounts();
   } catch (e) {
-    console.error('還原失敗，清除舊資料', e);
-    localStorage.clear();
+    console.error('還原失敗，清除本場尾牙資料', e);
+    localStorage.removeItem(`${STORAGE_KEY}_winnerData`);
+    localStorage.removeItem(`${STORAGE_KEY}_drawnWinners`);
   };
 })();
+
 
 
 //刪除歷史紀錄
@@ -1163,16 +1171,16 @@ clearAllBtn.addEventListener('click', () => {
     winnerLists.forEach(list => list.innerHTML = '');
 
     // 清除 localStorage
-    localStorage.removeItem('winnerData');
-    localStorage.removeItem('drawnWinners');
+    localStorage.removeItem(`${STORAGE_KEY}_winnerData`);
+    localStorage.removeItem(`${STORAGE_KEY}_drawnWinners`);
 
     //更新統計
     updateCounts();
 
     //成功 Toast
-    const successBody = document.getElementById("success-toast-body");
+    const successBody = document.querySelector('#success-toast-body');
     successBody.innerHTML = `<p class="m-0">已清除所有中獎名單</p>`;
-    const successToastEl = document.getElementById("success-toast");
+    const successToastEl = document.querySelector('#success-toast');
     const successToast = new bootstrap.Toast(successToastEl);
     successToast.show();
   };
