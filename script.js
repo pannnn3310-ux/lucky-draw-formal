@@ -601,10 +601,28 @@ function showWinnerEffect() {
     confetti({ origin: { x: 0.1, y: 0.9 }, angle: 60, spread: 100, startVelocity: 45, particleCount: 200, scalar: 1.1, decay: 0.9 });
     confetti({ origin: { x: 0.9, y: 0.9 }, angle: 120, spread: 100, startVelocity: 45, particleCount: 200, scalar: 1.1, decay: 0.9 });
   };
-  if (dropdownButton.dataset.value === "1") {
+
+  for (let angle = 0; angle < 360; angle += 20) {
+    confetti({
+      particleCount: 10,
+      angle: angle,
+      spread: 10,
+      startVelocity: 40,
+      gravity: 0.15,
+      colors: ['#FFD700', '#FF4D4D'],
+      origin: { x: 0.5, y: 0.5 }
+    });
+  };
+
+
+  const prizeValue = Number(dropdownButton.dataset.value);
+
+  if (prizeValue === 1) {
     [0.2, 0.4, 0.6, 0.8].forEach((x, i) => {
       setTimeout(() => showFireworks(x), i * 220);
     });
+  } else if (prizeValue === 10) {
+    specialShow();
   } else {
     return;
   };
@@ -640,6 +658,35 @@ function showFireworks(x = 0.5) {
       origin: { x, y: 0.4 }
     });
   }, 620);
+};
+
+function specialShow() {
+  //左
+  confetti({
+    particleCount: 150,
+    angle: 120,
+    spread: 140,
+    startVelocity: 20,
+    gravity: 0.22,
+    ticks: 300,
+    scalar: 1.2,
+    colors: ['#FFD700'],
+    origin: { x: 0.5, y: 0.3 }
+  });
+
+  // 右
+  confetti({
+    particleCount: 190,
+    angle: 90,
+    spread: 140,
+    startVelocity: 60,
+    gravity: 0.22,
+    ticks: 380,
+    scalar: 1.4,
+    colors: ['#FFD700'],
+    origin: { x: 0.5, y: 0.3 }
+  });
+
 };
 
 function showShareExceedToast(remaining, shareAmount, exceed, onConfirm, onCancel) {
@@ -847,7 +894,6 @@ function handleWinnerText(winner) {
   });
 
   winnerLists.forEach(list => list.insertBefore(li.cloneNode(true), list.firstChild));
-
   showWinnerEffect();
   updateCounts();
   saveState();
