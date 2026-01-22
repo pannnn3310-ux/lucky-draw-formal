@@ -36,7 +36,7 @@
               </button>
                 <ul class="dropdown-menu text-center">
                   <li>
-                    <a class="dropdown-item" href="#" data-value="1">頭獎(一名)</a>
+                    <a class="dropdown-item" href="#" data-value="1">頭獎</a>
                   </li>
                   <li>
                     <a class="dropdown-item" href="#" data-value="2">二獎</a>
@@ -139,15 +139,17 @@
             <label class="text-light w-25">匯入名單（Excel）：
               <input type="file" id="file-input" accept=".xlsx" />
             </label>
-            <div class="d-flex w-50 justify-content-between">
-              <button id="export-btn" class="btn btn-light w-50">匯出名單</button>
+            <div>
+              <button id="export-btn" class="btn btn-light">匯出名單</button>
               <div id="hand-animation-container"></div>
-              <button id="clear-all-btn" type="button" class="btn btn-sm btn-danger">清除紀錄</button>
             </div>
           </div>
           <div class="my-3 right-panel text-center">
             <h3>中獎名單</h3>
             <ul class="winner-list fs-4" id="winner-list"></ul>
+          </div>
+          <div class="d-flex justify-content-end">
+            <button id="clear-all-btn" type="button" class="btn btn-sm btn-danger">清除紀錄</button>
           </div>
         </div>
       <!-- pc -->

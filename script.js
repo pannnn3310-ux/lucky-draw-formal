@@ -838,23 +838,19 @@ function handleWinnerText(winner) {
     li.innerHTML = `
       <p>${prizeName}${displayLine}：${prizeAmountsText}</p>
       <p style="color:#D67158;">【${bonusText}-幸運分享】</p>
-      <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
     `;
   } else if (prizeValue === "11") {
         li.innerHTML = `
       <p>${prizeName}${displayLine}：${prizeAmountsText}</p>
-      <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
     `;
   } else if (prizeValue === "10") {
     li.innerHTML = `
       <p>${displayText}【金額：${specialBonusText}】：${prizeAmountsText}</p>
       <p style="color:#D67158;">【${bonus2Text}】</p>
-      <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
     `;
   } else {
     li.innerHTML = `
       <p>${displayText}${prizeAmountsText}</p>
-      <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
     `;
   };
 
@@ -1211,7 +1207,6 @@ function saveState() {
       li.innerHTML = `
         <p>${w.prize}${displayLine}：${w.dept} - ${w.name}</p>
         ${bonusLine}
-        <span class="remove-btn" style="cursor:pointer;color:red;">✖</span>
       `;
 
       winnerLists.forEach(list => list.appendChild(li.cloneNode(true)));
