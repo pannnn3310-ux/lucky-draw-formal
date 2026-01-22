@@ -329,6 +329,7 @@ dropdownItems.forEach(item => {
     prizeText.textContent = item.textContent;
     dropdownButton.dataset.value = value;
     specialPrizeInput.value = '';
+    specialPrizeInput.dataset.id = '';
     specialPrizeInput2.value = '';
     specialBalanceInput.value = '';
     specialPrizeAmountInput.value = '';
@@ -397,6 +398,48 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
 
       return;
     };
+
+    const selectedPrize = dropdownButton.dataset.value;
+
+    // 9獎防呆：分享人 & 分享金額
+    if (selectedPrize === "9") {
+    const shareId = specialPrizeInput.dataset.id;
+    const shareName = specialPrizeInput.value?.trim();
+    const shareAmount = Number(specialPrizeAmountInput.value || 0);
+
+      if (!shareName || !shareId || shareAmount <= 0) {
+        const listToast = document.querySelector('#list-toast-body');
+        listToast.innerHTML = `<p class="m-0">請先選擇「分享人」以及輸入「分享金額」才能抽獎！</p>`;
+        const toastElement = document.querySelector('#list-toast');
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+        return;
+      };
+    } else if (selectedPrize === "10") {
+      const bonusName = specialPrizeInput2.value?.trim();
+      const bonusAmount = Number(specialPrizeAmountInput.value || 0);
+
+      if (!bonusName || bonusAmount <= 0) {
+        const listToast = document.querySelector('#list-toast-body');
+        listToast.innerHTML = `<p class="m-0">請先選擇「加碼人」以及輸入「加碼金額」才能抽獎！</p>`;
+        const toastElement = document.querySelector('#list-toast');
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+        return;
+      };
+    } else if (selectedPrize === "11") {
+      const bonusAmount = Number(specialPrizeAmountInput.value || 0);
+      if (bonusAmount <= 0) {
+        const listToast = document.querySelector('#list-toast-body');
+        listToast.innerHTML = `<p class="m-0">請先輸入金額才能抽獎！</p>`;
+        const toastElement = document.querySelector('#list-toast');
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+        return;
+      };
+    };
+
+
     lever.classList.add("pull");
     lever.classList.add("no-glow");
 
@@ -790,6 +833,7 @@ function bindShareAmountInput() {
         () => {
           specialBalanceBtn.style.display = 'none';
           specialBalanceInput.style.display = 'block';
+          cashBuns.style.display = 'block';
           specialBalanceInput.value =
             Number(specialBalanceInput.value || 0) + exceed;
           specialPrizeAmountInput.value = remaining;
