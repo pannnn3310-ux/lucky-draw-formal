@@ -355,6 +355,10 @@ dropdownItems.forEach(item => {
   });
 });
 
+//防呆用
+function hasSelectedPrize() {
+  return !!dropdownButton.dataset.value;
+};
 
 // 拉霸按鈕事件
 document.querySelectorAll('.lever .prize-btn').forEach(btn => {
@@ -362,6 +366,14 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
     e.preventDefault();
     e.stopPropagation();
 
+    if (!hasSelectedPrize()) {
+      const listToast = document.querySelector('#list-toast-body');
+      listToast.innerHTML = `<p class="m-0">請先選擇獎項！</p>`;
+      const toastElement = document.querySelector('#list-toast');
+      const toast = new bootstrap.Toast(toastElement);
+      toast.show();
+      return;
+    };
     if (isConfirming) return;
     if (allNames.length === 0) {
       const listToast = document.querySelector('#list-toast-body');
@@ -374,14 +386,24 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
     };
     lever.classList.add("pull");
     lever.classList.add("no-glow");
-    await new Promise(resolve => setTimeout(resolve, 300));
 
-    reels.forEach(r => r.items.forEach(item => item.classList.remove('winner-highlight')));
+    try {
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-    if (!isConfirming && autoScrollId !== null) {
-      await doDraw();
+      reels.forEach(r =>
+        r.items.forEach(item =>
+          item.classList.remove('winner-highlight')
+        )
+      );
+
+      if (!isConfirming && autoScrollId !== null) {
+        await doDraw();
+      };
+
+    } finally {
+      lever.classList.remove("pull");
     };
-    lever.classList.remove("pull");
+
   });
 });
 
