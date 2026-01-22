@@ -19,6 +19,7 @@ const specialPrizeAmountInput = document.querySelector('#special-prize-amount-in
 const specialBalanceBtn = document.querySelector('#special-balance-btn');
 const specialBalanceInput = document.querySelector('#special-balance-input');
 const clearAllBtn = document.querySelector('#clear-all-btn');
+const cashBuns = document.querySelector('#cash-bonus-label');
 const stickChang = document.querySelector('.stick');
 
 const winnerLists = [
@@ -53,10 +54,19 @@ specialPrizeInput.addEventListener('input', e => {
 });
 
 specialBalanceBtn.addEventListener('click', () => {
-  // 顯示輸入框，隱藏按鈕
+  if (dropdownButton.dataset.value === "11") {
+    specialBalanceInput.style.display = 'block';
+    specialBalanceBtn.style.display = "none";
+    cashBuns.style.display = "none"; // 不顯示
+    return;
+  };
+
+  // 其他獎項：顯示輸入框，隱藏按鈕，顯示現金加碼標籤
   specialBalanceInput.style.display = 'block';
   specialBalanceBtn.style.display = "none";
+  cashBuns.style.display = "block";
 });
+
 
 
 document.addEventListener('click', e => {
@@ -337,6 +347,7 @@ dropdownItems.forEach(item => {
       specialPrizeInput.style.display = "none";
       specialBalanceBtn.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
+      cashBuns.style.display = 'none';
       setStickOffset(40);
     } else if (value === "11") {  // 額外加碼獎
       specialBalanceInput.style.display = "none";
@@ -345,10 +356,12 @@ dropdownItems.forEach(item => {
       specialPrizeInput2.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
       specialBalanceBtn.style.display = "block";
+      cashBuns.style.display = 'none';
       setStickOffset(35);
     } else {
       specialPrizeContainer.style.display = "none";
       specialBalanceBtn.style.display = "none";
+      cashBuns.style.display = 'none';
       setStickOffset(0);
     };
 

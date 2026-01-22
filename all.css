@@ -358,4 +358,24 @@ ol, ul {
   animation: start 3s infinite ease-in-out;
   text-shadow: 0 0 50px #fff, 0 0 150px #fff, 0 0 20px #fff;
   font-weight: 400;
+}
+
+.cash-bonus-label {
+  font-size: 1.2rem;
+  color: #D67158;
+  margin-top: 10px;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.cash-bonus-label {
+  position: absolute;
+  top: 68%;
+  left: 30%;
+  margin-top: 10px;
+  color: #c05b13;
+  -webkit-text-stroke: 5px rgb(255, 255, 255);
+  paint-order: stroke;
 }/*# sourceMappingURL=all.css.map */
