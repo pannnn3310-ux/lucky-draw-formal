@@ -361,21 +361,8 @@ ol, ul {
 }
 
 .cash-bonus-label {
-  font-size: 1.2rem;
-  color: #D67158;
-  margin-top: 10px;
-}
-
-.dropdown {
-  position: relative;
-}
-
-.cash-bonus-label {
-  position: absolute;
-  top: 68%;
-  left: 30%;
-  margin-top: 10px;
   color: #c05b13;
   -webkit-text-stroke: 5px rgb(255, 255, 255);
   paint-order: stroke;
+  margin-left: 45%;
 }/*# sourceMappingURL=all.css.map */
