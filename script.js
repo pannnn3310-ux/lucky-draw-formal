@@ -22,6 +22,43 @@ const clearAllBtn = document.querySelector('#clear-all-btn');
 const cashBuns = document.querySelector('#cash-bonus-label');
 const stickChang = document.querySelector('.stick');
 
+//music
+const drawSound = document.querySelector('#draw-sound');
+const drawSound1 = document.querySelector('#draw-sound-1');
+const winSound = document.querySelector('#win-sound');
+const don = document.querySelector('#win-don');
+
+function playDrawSound() {
+  drawSound.currentTime = 0;
+  drawSound.play();
+};
+
+function stopDrawSound() {
+  drawSound.pause();
+  drawSound.currentTime = 0;
+};
+
+function playDrawSound1() {
+  drawSound1.currentTime = 0;
+  drawSound1.play();
+};
+
+function stopDrawSound1() {
+  drawSound1.pause();
+  drawSound1.currentTime = 0;
+};
+
+function playDon() {
+  const a = new Audio(don.src);
+  a.play();
+};
+
+
+function playWinSound() {
+  winSound.currentTime = 0;
+  winSound.play();
+};
+
 const winnerLists = [
   document.querySelector('#winner-list'),
   document.querySelector('#winner-list-mobile')
@@ -36,7 +73,7 @@ specialPrizeAmountInput.addEventListener('input', () => {
     const value = Number(specialPrizeAmountInput.value);
       if (value && value < 2000) {
         specialPrizeAmountInput.focus();
-    specialPrizeAmountInput.classList.add('is-invalid');
+        specialPrizeAmountInput.classList.add('is-invalid');
       } else {
         specialPrizeAmountInput.classList.remove('is-invalid');
       };
@@ -428,8 +465,8 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
         return;
       };
     } else if (selectedPrize === "11") {
-      const bonusAmount = Number(specialPrizeAmountInput.value || 0);
-      if (bonusAmount <= 0) {
+      const amount = Number(specialPrizeAmountInput.value || 0);
+      if (amount <= 0) {
         const listToast = document.querySelector('#list-toast-body');
         listToast.innerHTML = `<p class="m-0">請先輸入金額才能抽獎！</p>`;
         const toastElement = document.querySelector('#list-toast');
@@ -452,6 +489,7 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
         )
       );
 
+
       if (!isConfirming && autoScrollId !== null) {
         await doDraw();
       };
@@ -467,6 +505,13 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
 // 抽獎
 
 async function doDraw() {
+
+  //音效
+  stopDrawSound();
+  stopDrawSound1();
+  winSound.pause();
+  winSound.currentTime = 0;
+
   // **抽出還未中獎列表，用途，避免重覆中獎
   const available = allNames.filter(p => !drawnWinners.has(p.id));
   if (!available.length) {
@@ -515,6 +560,7 @@ async function doDraw() {
   const centerOffset = (viewportHeight / 2) - (ITEM_HEIGHT / 2);
 
   if (dropdownButton.dataset.value === "1") {
+    playDrawSound1();
     const totalTime = 10000; // 10秒總時長
     const midAnimationTime = 1000; // 中間動畫 1 秒
     const firstHalfTime = 3500; // 第一段滾輪 3.5 秒
@@ -541,34 +587,59 @@ async function doDraw() {
 
     // 第二段滾輪：分別啟動，每軸帶入小 delay 以產生依序停的感覺
     const p0 = spinReel(reels[0], reelTargetIndexes[0], reelDurations[0] / 2, 0, fullRounds - halfRounds)
-      .then(() => highlightReel(0));
+      .then(() => {
+        highlightReel(0)
+        playDon();
+      });
     const p1 = spinReel(reels[1], reelTargetIndexes[1], reelDurations[1] / 2, 150, fullRounds - halfRounds)
-      .then(() => highlightReel(1));
+      .then(() => {
+        highlightReel(1)
+        playDon();
+      });
     const p2 = spinReel(reels[2], reelTargetIndexes[2], reelDurations[2] / 2, 300, fullRounds - halfRounds)
-      .then(() => highlightReel(2));
+      .then(() => {
+        highlightReel(2);
+        playDon();
+      });
 
     await Promise.all([p0, p1, p2]);
 
     handleWinnerText(winner);
     populateSpecialPrizeList();
 
+    stopDrawSound1();
+    playWinSound();
+
     setTimeout(() => {
+
       main.classList.remove('active');
       lever.classList.remove('no-glow');
       startAutoScroll();
       isConfirming = false;
     }, 4000);
   } else {
+    playDrawSound();
     // 其他獎項保持原流程
     const p0 = spinReel(reels[0], reelTargetIndexes[0], reelDurations[0], 0, fullRounds)
-      .then(() => highlightReel(0));
+      .then(() => {
+        highlightReel(0)
+        playDon();
+      });
     const p1 = spinReel(reels[1], reelTargetIndexes[1], reelDurations[1], 0, fullRounds)
-      .then(() => highlightReel(1));
+      .then(() => {
+        highlightReel(1)
+        playDon();
+      });
     const p2 = spinReel(reels[2], reelTargetIndexes[2], reelDurations[2], 0, fullRounds)
-      .then(() => highlightReel(2))
+      .then(() => {
+        highlightReel(2)
+        playDon();
+      })
       .then(() => {
         // 最終停齊位置正中
         handleWinnerText(winner);
+          stopDrawSound();
+          playWinSound();
 
         setTimeout(() => {
           main.classList.remove('active');
