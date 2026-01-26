@@ -398,9 +398,10 @@ dropdownItems.forEach(item => {
       specialPrizeInput.style.display = "none";
       specialPrizeInput2.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
-      specialBalanceBtn.style.display = "block";
+      specialBalanceBtn.style.display = "none";
       cashBuns.style.display = 'none';
       setStickOffset(35);
+      specialPrizeContainer.classList.replace('mt-2', 'mt-4');
     } else {
       specialPrizeContainer.style.display = "none";
       specialBalanceBtn.style.display = "none";
