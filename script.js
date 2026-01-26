@@ -27,6 +27,7 @@ const drawSound = document.querySelector('#draw-sound');
 const drawSound1 = document.querySelector('#draw-sound-1');
 const winSound = document.querySelector('#win-sound');
 const don = document.querySelector('#win-don');
+const cheer = document.querySelector('#cheer');
 
 function playDrawSound() {
   drawSound.currentTime = 0;
@@ -53,6 +54,10 @@ function playDon() {
   a.play();
 };
 
+function playCheer() {
+  cheer.currentTime = 0;
+  cheer.play();
+};
 
 function playWinSound() {
   winSound.currentTime = 0;
@@ -560,10 +565,10 @@ async function doDraw() {
   const centerOffset = (viewportHeight / 2) - (ITEM_HEIGHT / 2);
 
   if (dropdownButton.dataset.value === "1") {
-    playDrawSound1();
+    playDrawSound();
     const totalTime = 10000; // 10秒總時長
-    const midAnimationTime = 1000; // 中間動畫 1 秒
-    const firstHalfTime = 3500; // 第一段滾輪 3.5 秒
+    const midAnimationTime = 1500; // 中間動畫
+    const firstHalfTime = 3000; // 第一段滾輪
     const secondHalfTime = totalTime - midAnimationTime - firstHalfTime; // 第二段滾輪剩下 5.5 秒
 
     // 獎項1：分兩段滾輪 + 中間暫停動畫
@@ -581,22 +586,26 @@ async function doDraw() {
       spinReel(reels[1], preTargetIndexes[1], firstHalfTime, 0, halfRounds),
       spinReel(reels[2], preTargetIndexes[2], firstHalfTime, 0, halfRounds)
     ]);
+    stopDrawSound();
+    setTimeout(() => {
+    playDrawSound1();
+    }, 1500);
 
     // 暫停 + 動畫（你的淡出/彈入/空白邏輯）
-    await freezeMidAnimation(2000);
+    await freezeMidAnimation(midAnimationTime);
 
     // 第二段滾輪：分別啟動，每軸帶入小 delay 以產生依序停的感覺
-    const p0 = spinReel(reels[0], reelTargetIndexes[0], reelDurations[0] / 2, 0, fullRounds - halfRounds)
+    const p0 = spinReel(reels[0], reelTargetIndexes[0], reelDurations[0] , 0, fullRounds - halfRounds)
       .then(() => {
         highlightReel(0)
         playDon();
       });
-    const p1 = spinReel(reels[1], reelTargetIndexes[1], reelDurations[1] / 2, 150, fullRounds - halfRounds)
+    const p1 = spinReel(reels[1], reelTargetIndexes[1], reelDurations[1] , 150, fullRounds - halfRounds)
       .then(() => {
         highlightReel(1)
         playDon();
       });
-    const p2 = spinReel(reels[2], reelTargetIndexes[2], reelDurations[2] / 2, 300, fullRounds - halfRounds)
+    const p2 = spinReel(reels[2], reelTargetIndexes[2], reelDurations[2] , 300, fullRounds - halfRounds)
       .then(() => {
         highlightReel(2);
         playDon();
@@ -609,6 +618,7 @@ async function doDraw() {
 
     stopDrawSound1();
     playWinSound();
+    playCheer();
 
     setTimeout(() => {
 
