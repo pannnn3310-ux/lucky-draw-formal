@@ -595,8 +595,8 @@ async function doDraw() {
   } else if (noDelayPrizes56.includes(prizeValue)) {
     reelDurations = [
       800 + fullRounds * 200,
-      800 + fullRounds * 200+3000,
-      800 + fullRounds * 200+3000
+      800 + fullRounds * 200 + 3000,
+      800 + fullRounds * 200 + 3000
     ];
   } else {
     reelDurations = [
@@ -611,10 +611,10 @@ async function doDraw() {
 
   if (dropdownButton.dataset.value === "1") {
     playDrawSound();
-    const totalTime = 10000; // 10秒總時長
+    const totalTime = 30000; // 10秒總時長
     const midAnimationTime = 1500; // 中間動畫
     const firstHalfTime = 3000; // 第一段滾輪
-    const secondHalfTime = totalTime - midAnimationTime - firstHalfTime; // 第二段滾輪剩下 5.5 秒
+    // const secondHalfTime = totalTime - midAnimationTime - firstHalfTime; // 第二段滾輪剩下 5.5 秒
 
     // 獎項1：分兩段滾輪 + 中間暫停動畫
     const halfRounds = Math.floor(fullRounds / 2);
@@ -631,6 +631,16 @@ async function doDraw() {
       spinReel(reels[1], preTargetIndexes[1], firstHalfTime, 0, halfRounds),
       spinReel(reels[2], preTargetIndexes[2], firstHalfTime, 0, halfRounds)
     ]);
+
+
+    const firstPrizeExtraTime = 30000; // ⭐ 想拉多長就加多少
+
+      const firstPrizeReelDurations = [
+        reelDurations[0] + firstPrizeExtraTime,
+        reelDurations[1] + firstPrizeExtraTime,
+        reelDurations[2] + firstPrizeExtraTime
+      ];
+
     stopDrawSound();
     setTimeout(() => {
     stopBi();
@@ -641,17 +651,17 @@ async function doDraw() {
     await freezeMidAnimation(midAnimationTime);
 
     // 第二段滾輪：分別啟動，每軸帶入小 delay 以產生依序停的感覺
-    const p0 = spinReel(reels[0], reelTargetIndexes[0], reelDurations[0] , 0, fullRounds - halfRounds)
+    const p0 = spinReel(reels[0], reelTargetIndexes[0], firstPrizeReelDurations[0] , 0, fullRounds - halfRounds)
       .then(() => {
         highlightReel(0)
         playDon();
       });
-    const p1 = spinReel(reels[1], reelTargetIndexes[1], reelDurations[1] , 150, fullRounds - halfRounds)
+    const p1 = spinReel(reels[1], reelTargetIndexes[1], firstPrizeReelDurations[1] , 150, fullRounds - halfRounds)
       .then(() => {
         highlightReel(1)
         playDon();
       });
-    const p2 = spinReel(reels[2], reelTargetIndexes[2], reelDurations[2] , 300, fullRounds - halfRounds)
+    const p2 = spinReel(reels[2], reelTargetIndexes[2], firstPrizeReelDurations[2] , 300, fullRounds - halfRounds)
       .then(() => {
         highlightReel(2);
         playDon();
@@ -1226,10 +1236,12 @@ async function playPrizeAnimation(midTime = 1000) { // 傳入中間動畫時間
 
   // 縮短消失停留
   panel.style.visibility = 'hidden';
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
   panel.style.visibility = '';
+  panel.classList.add('long-flash');
   await playAnimation('animate__flash');
+  panel.classList.remove('long-flash');
 };
 
 // 凍結特效 + 淡出彈入動畫

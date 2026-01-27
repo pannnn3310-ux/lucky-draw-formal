@@ -328,6 +328,10 @@ ol, ul {
     filter: contrast(0.8) brightness(1.2);
   }
 }
+.long-flash {
+  animation-duration: 3s !important;
+}
+
 #hand-animation-container {
   width: 400px;
   height: 400px;
