@@ -667,6 +667,40 @@ async function doDraw() {
       startAutoScroll();
       isConfirming = false;
     }, 4000);
+  } else if(dropdownButton.dataset.value === "7" || dropdownButton.dataset.value === "8"){
+    playDrawSound();
+    // 其他獎項保持原流程
+    const p0 = spinReel(reels[0], reelTargetIndexes[0], reelDurations[0], 0, fullRounds)
+      .then(() => {
+        highlightReel(0)
+        playDon();
+      });
+    const p1 = spinReel(reels[1], reelTargetIndexes[1], reelDurations[1], 0, fullRounds)
+      .then(() => {
+        highlightReel(1)
+        playDon();
+      });
+    const p2 = spinReel(reels[2], reelTargetIndexes[2], reelDurations[2], 0, fullRounds)
+      .then(() => {
+        highlightReel(2)
+      })
+      .then(() => {
+        // 最終停齊位置正中
+        handleWinnerText(winner);
+          stopDrawSound();
+          playWinSound();
+
+        setTimeout(() => {
+          main.classList.remove('active');
+          lever.classList.remove('no-glow');
+          reels.forEach(reel => {
+            const totalHeight = reel.items.length * ITEM_HEIGHT;
+            reel.position = ((reel.position % totalHeight) + totalHeight) % totalHeight;
+          });
+          startAutoScroll();
+          isConfirming = false;
+        }, 4000);
+      });
   } else {
     playDrawSound();
     // 其他獎項保持原流程
