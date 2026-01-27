@@ -33,7 +33,7 @@ ol, ul {
   position: relative;
   overflow: hidden;
   min-height: 900px;
-  padding: 0;
+  padding-top: 100px;
 }
 .main .container {
   position: relative;
