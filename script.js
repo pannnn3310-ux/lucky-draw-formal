@@ -28,6 +28,8 @@ const drawSound1 = document.querySelector('#draw-sound-1');
 const winSound = document.querySelector('#win-sound');
 const don = document.querySelector('#win-don');
 const cheer = document.querySelector('#cheer');
+const bi = document.querySelector('#bi');
+
 
 function playDrawSound() {
   drawSound.currentTime = 0;
@@ -47,6 +49,16 @@ function playDrawSound1() {
 function stopDrawSound1() {
   drawSound1.pause();
   drawSound1.currentTime = 0;
+};
+
+function playBi() {
+  bi.currentTime = 0;
+  bi.play();
+};
+
+function stopBi() {
+  bi.pause();
+  bi.currentTime = 0;
 };
 
 function playDon() {
@@ -592,6 +604,7 @@ async function doDraw() {
     ]);
     stopDrawSound();
     setTimeout(() => {
+    stopBi();
     playDrawSound1();
     }, 1500);
 
@@ -1192,6 +1205,7 @@ async function playPrizeAnimation(midTime = 1000) { // 傳入中間動畫時間
 
 // 凍結特效 + 淡出彈入動畫
 async function freezeMidAnimation(midTime = 1000) {
+  playBi();
   await playPrizeAnimation(midTime);
   reels.forEach(r => r.el.style.transition = "");
 };
