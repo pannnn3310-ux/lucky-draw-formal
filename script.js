@@ -381,7 +381,8 @@ dropdownItems.forEach(item => {
       specialPrizeInput.style.display = "inline-block";
       specialPrizeInput2.style.display = "none";
       specialPrizeAmountInput.style.display = "block";
-      setStickOffset(110);
+      setStickOffset(100);
+      specialPrizeContainer.classList.replace("mt-4", "mt-2");
       specialBalanceBtn.style.display = "block";
     } else if (value === "10"){
       specialBalanceInput.style.display = "none";
@@ -392,7 +393,8 @@ dropdownItems.forEach(item => {
       specialPrizeAmountInput.style.display = "block";
       cashBuns.style.display = 'none';
       setStickOffset(40);
-    } else if (value === "11") {  // 額外加碼獎
+      specialPrizeContainer.classList.replace("mt-4", "mt-2");
+    } else if (value === "11") {  // 追加獎
       specialBalanceInput.style.display = "none";
       specialPrizeContainer.style.display = "block";
       specialPrizeInput.style.display = "none";
@@ -400,13 +402,14 @@ dropdownItems.forEach(item => {
       specialPrizeAmountInput.style.display = "block";
       specialBalanceBtn.style.display = "none";
       cashBuns.style.display = 'none';
-      setStickOffset(35);
+      setStickOffset(0);
       specialPrizeContainer.classList.replace('mt-2', 'mt-4');
     } else {
       specialPrizeContainer.style.display = "none";
       specialBalanceBtn.style.display = "none";
       cashBuns.style.display = 'none';
       setStickOffset(0);
+      specialPrizeContainer.classList.replace("mt-4", "mt-2");
     };
 
   });
