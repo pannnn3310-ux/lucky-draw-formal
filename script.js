@@ -473,6 +473,29 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
         toast.show();
         return;
       };
+
+      const remaining = getRemainingShareAmount(shareId);
+        if (shareAmount > remaining) {
+          const exceed = shareAmount - remaining;
+          showShareExceedToast(
+            remaining,
+            shareAmount,
+            exceed,
+            () => {
+              specialBalanceBtn.style.display = 'none';
+              specialBalanceInput.style.display = 'block';
+              cashBuns.style.display = 'block';
+              specialBalanceInput.value =
+                Number(specialBalanceInput.value || 0) + exceed;
+              specialPrizeAmountInput.value = remaining;
+            },
+            () => {
+              specialPrizeAmountInput.value = remaining;
+            },
+          );
+          return; // 這行很重要：阻止抽獎
+        };
+
     } else if (selectedPrize === "10") {
       const bonusName = specialPrizeInput2.value?.trim();
       const bonusAmount = Number(specialPrizeAmountInput.value || 0);
@@ -1461,4 +1484,17 @@ clearAllBtn.addEventListener('click', () => {
 
 function setStickOffset(px) {
   stickChang.style.transform = `translateY(calc(0% + ${px}px))`;
+};
+
+function getRemainingShareAmount(shareId) {
+  const target = winnerData.find(w => w.id === shareId);
+  if (!target) return 0;
+
+  const originalAmount = target.prizeAmounts || 0;
+
+  const usedShare = winnerData
+    .filter(w => w.shareToId === shareId)
+    .reduce((sum, w) => sum + (w.shareAmount || 0), 0);
+
+  return originalAmount - usedShare;
 };
