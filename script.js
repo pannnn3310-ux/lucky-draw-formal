@@ -599,9 +599,9 @@ async function doDraw() {
     ];
   } else if (noDelayPrizes12.includes(prizeValue)) {
     reelDurations = [
-      800 + fullRounds * 30,
-      800 + fullRounds * 30 ,
-      800 + fullRounds * 30
+      800 + fullRounds ,
+      800 + fullRounds  ,
+      800 + fullRounds 
     ];
   } else if (noDelayPrizes56.includes(prizeValue)) {
     reelDurations = [
