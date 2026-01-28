@@ -235,11 +235,14 @@ function getFullRounds(prizeValue) {
     3: 10,
     4: 9,
     5: 7,
-    6: 5,
+    6: 7,
     7: 4,
-    8: 3,
+    8: 4,
     9: 3,
-    10: 3
+    10: 3,
+    11: 3,
+    12: 3,
+    13: 3,
   };
   return roundsMap[prizeValue] || 3;
 };
@@ -607,12 +610,30 @@ async function doDraw() {
     ];
   };
 
+  const prizeExtraTimeMap = {
+    // 1: 30000, // 一獎（你已經在用） 50s
+    2: 8000,  // ⭐ 二獎拉長 8 秒     17s
+    3: 3000,  // 三獎微拉             11s
+    4: 2000,                       //10s
+    5: 1000,                       //6s
+    6: 1000,                       //6s
+    7: 500,                        //5s
+    8: 500,                        //5s
+    9: 900,                        //9s
+    10: 900,                       //9s
+    11: 900,                       //9s
+    12: 900,                       //9s
+  };
+
+
+  const extraTime = prizeExtraTimeMap[prizeValue] || 0;
+  reelDurations = reelDurations.map(t => t + extraTime);
+
   const viewportHeight = document.querySelector('.scroll-viewport').offsetHeight;
   const centerOffset = (viewportHeight / 2) - (ITEM_HEIGHT / 2);
 
   if (dropdownButton.dataset.value === "1") {
     playDrawSound();
-    const totalTime = 30000; // 10秒總時長
     const midAnimationTime = 1500; // 中間動畫
     const firstHalfTime = 3000; // 第一段滾輪
     // const secondHalfTime = totalTime - midAnimationTime - firstHalfTime; // 第二段滾輪剩下 5.5 秒
@@ -620,27 +641,25 @@ async function doDraw() {
     // 獎項1：分兩段滾輪 + 中間暫停動畫
     const halfRounds = Math.floor(fullRounds / 2);
 
-    // 第一段滾輪：滾到距離中獎者還 3 格的位置（修正避免空白或消失）
-    const preTargetIndexes = reels.map((r, i) => {
-      const target = reelTargetIndexes[i];
-      const fullLength = r.mapIndex.length;
-      return (target - 3 + fullLength) % fullLength;
-    });
-
     await Promise.all([
-      spinReel(reels[0], preTargetIndexes[0], firstHalfTime, 0, halfRounds),
-      spinReel(reels[1], preTargetIndexes[1], firstHalfTime, 0, halfRounds),
-      spinReel(reels[2], preTargetIndexes[2], firstHalfTime, 0, halfRounds)
+      spinReel(reels[0], reelTargetIndexes[0], firstHalfTime, 0, halfRounds),
+      spinReel(reels[1], reelTargetIndexes[1], firstHalfTime, 0, halfRounds),
+      spinReel(reels[2], reelTargetIndexes[2], firstHalfTime, 0, halfRounds)
     ]);
+
+    // 只停一下（你要的「停格」）
+    await new Promise(resolve => setTimeout(resolve, 1200));
+
 
 
     const firstPrizeExtraTime = 30000; // ⭐ 想拉多長就加多少
 
-      const firstPrizeReelDurations = [
-        reelDurations[0] + firstPrizeExtraTime,
-        reelDurations[1] + firstPrizeExtraTime,
-        reelDurations[2] + firstPrizeExtraTime
-      ];
+
+    const firstPrizeReelDurations = [
+      reelDurations[0] + firstPrizeExtraTime,
+      reelDurations[1] + firstPrizeExtraTime,
+      reelDurations[2] + firstPrizeExtraTime
+    ];
 
     stopDrawSound();
     setTimeout(() => {
@@ -723,155 +742,80 @@ async function doDraw() {
 };
 
 
-// function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3) {
-//   return new Promise(resolve => {
-//     setTimeout(() => {
-//       const startTime = performance.now();
-//       const startPos = reel.position;
-//       const totalHeight = ITEM_HEIGHT * reel.items.length;
-//       const viewportHeight = document.querySelector('.scroll-viewport').offsetHeight;
-//       const centerOffset = (viewportHeight / 2) - (ITEM_HEIGHT / 2);
-
-//       // 找最接近中間輪次的 target，而不是最後一個
-//       const totalItems = reel.mapIndex.length;
-//       let reelTargetItemIndex = null;
-//       for (let i = 0; i < totalItems; i++) {
-//         if (reel.mapIndex[i] === targetIndex) {
-//           // 找第一個可見的，避免 append 多輪後停錯
-//           if (i * ITEM_HEIGHT >= startPos) {
-//             reelTargetItemIndex = i;
-//             break;
-//           };
-//         };
-//       };
-//       // 如果沒找到，直接用最後一個
-//       if (reelTargetItemIndex === null) {
-//         for (let i = totalItems - 1; i >= 0; i--) {
-//           if (reel.mapIndex[i] === targetIndex) {
-//             reelTargetItemIndex = i;
-//             break;
-//           };
-//         };
-//       };
-
-//       const targetPos = reelTargetItemIndex * ITEM_HEIGHT;
-
-//       function easeOutQuad(t) {
-//         return t * (2 - t);
-//       };
-
-//       function animate(now) {
-//         let t = (now - startTime) / duration;
-//         if (t > 1) t = 1;
-
-//         const eased = easeOutQuad(t);
-//         const distance = (targetPos - startPos + totalHeight * fullRounds);
-//         const currentPos = startPos + distance * eased;
-
-//         const displayPos = ((currentPos % totalHeight) + totalHeight) % totalHeight;
-
-//         reel.position = displayPos;
-//         reel.el.style.transform = `translateY(-${displayPos}px)`;
-
-//         if (t < 1) {
-//           requestAnimationFrame(animate);
-//         } else {
-//           //  最終強制對齊中心
-//           const finalTransform = targetPos - centerOffset;
-//           reel.el.style.transform = `translateY(-${finalTransform}px)`;
-//           reel.position = finalTransform; // 同步更新 reel.position
-//           reel.finalItemIndex = reelTargetItemIndex;
-//           resolve();
-//         };
-//       };
-
-//       requestAnimationFrame(animate);
-//     }, delay);
-//   });
-// };
-
 function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3) {
   return new Promise(resolve => {
     setTimeout(() => {
-
       const startTime = performance.now();
+
       const totalHeight = ITEM_HEIGHT * reel.items.length;
       const viewportHeight = document.querySelector('.scroll-viewport').offsetHeight;
       const centerOffset = (viewportHeight / 2) - (ITEM_HEIGHT / 2);
 
-      // ✅ 這才是「畫面上真正的 startPos」
       const startPos = ((reel.position % totalHeight) + totalHeight) % totalHeight;
 
-      // 找到 target index 的第一個位置（在 mapIndex 裡）
+      // 找正確的 target item
+      const totalItems = reel.mapIndex.length;
       let reelTargetItemIndex = null;
-      for (let i = 0; i < reel.mapIndex.length; i++) {
-        if (reel.mapIndex[i] === targetIndex) {
+
+      for (let i = 0; i < totalItems; i++) {
+        if (reel.mapIndex[i] === targetIndex && i * ITEM_HEIGHT >= startPos) {
           reelTargetItemIndex = i;
           break;
-        }
-      }
-
+        };
+      };
       if (reelTargetItemIndex === null) {
-        console.error("找不到 targetIndex");
-        resolve();
-        return;
-      }
+        for (let i = totalItems - 1; i >= 0; i--) {
+          if (reel.mapIndex[i] === targetIndex) {
+            reelTargetItemIndex = i;
+            break;
+          };
+        };
+      };
 
       const targetPos = reelTargetItemIndex * ITEM_HEIGHT;
-
-      function easeOutQuad(t) {
-        return t * (2 - t);
-      }
+      const travelDistance = totalHeight * fullRounds + (targetPos - startPos);
 
       function animate(now) {
         let t = (now - startTime) / duration;
-        if (t > 1) t = 1;
-
-        const eased = easeOutQuad(t);
-
-        // 距離用「從 startPos 到 targetPos 再多 fullRounds」
-        const distance = (targetPos - startPos) + (totalHeight * fullRounds);
-        const currentPos = startPos + distance * eased;
-
-        // 這裡一定要 modulo，避免滾到空白
-        const displayPos = ((currentPos % totalHeight) + totalHeight) % totalHeight;
-
-        reel.position = displayPos;
-        reel.el.style.transform = `translateY(-${displayPos}px)`;
-
-        if (t < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          // 最終強制對齊中心
+        if (t >= 1) {
+          // ✅ 直接瞬間鎖格（完全不做 easing）
           const finalTransform = targetPos - centerOffset;
-
-          // 這裡也要 normalize
-          const finalPos = ((finalTransform % totalHeight) + totalHeight) % totalHeight;
-
-          reel.el.style.transform = `translateY(-${finalPos}px)`;
-          reel.position = finalPos;
+          reel.el.style.transform = `translateY(-${finalTransform}px)`;
+          reel.position = finalTransform;
           reel.finalItemIndex = reelTargetItemIndex;
           resolve();
-        }
-      }
+          return;
+        };
+
+        // 這裡你可以用 linear / easeIn / 自己的速度曲線
+        const progress = t; // 👈 重點：不要用 easeOut
+        const currentPos = startPos + travelDistance * progress;
+
+        const displayPos = ((currentPos % totalHeight) + totalHeight) % totalHeight;
+        reel.el.style.transform = `translateY(-${displayPos}px)`;
+        reel.position = displayPos;
+
+        requestAnimationFrame(animate);
+      };
 
       requestAnimationFrame(animate);
-
     }, delay);
   });
-}
+};
 
 
 
 
 function highlightReel(i) {
   const reel = reels[i];
-  reel.items.forEach(item =>
-    item.classList.remove('winner-highlight'));
-    if (reel.finalItemIndex !== null) {
-      reel.items[reel.finalItemIndex] ?.classList.add('winner-highlight');
-    };
+  reel.items.forEach(item => item.classList.remove('winner-highlight'));
+
+  if (reel.finalItemIndex !== null) {
+    reel.items[reel.finalItemIndex]?.classList.add('winner-highlight');
+  };
 };
+
+
 
 
 // 紙花特效
