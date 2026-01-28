@@ -599,9 +599,9 @@ async function doDraw() {
     ];
   } else if (noDelayPrizes12.includes(prizeValue)) {
     reelDurations = [
-      800 + fullRounds ,
-      800 + fullRounds  ,
-      800 + fullRounds 
+      800 + fullRounds,
+      800 + fullRounds,
+      800 + fullRounds
     ];
   } else if (noDelayPrizes56.includes(prizeValue)) {
     reelDurations = [
@@ -665,9 +665,7 @@ async function doDraw() {
     // 只停一下（你要的「停格」）
     await new Promise(resolve => setTimeout(resolve, 1200));
 
-
-
-    const firstPrizeExtraTime = 30000; // ⭐ 想拉多長就加多少
+    const firstPrizeExtraTime = 30000;
 
 
     const firstPrizeReelDurations = [
@@ -811,7 +809,13 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
           return;
         };
 
-        const progress = easeInOutTriple(t);
+        const prizeValue = Number(dropdownButton.dataset.value);
+        let progress;
+        if (prizeValue === 1) {
+          progress = easeInOutTriple(t);
+        } else {
+          progress = t;
+        };
         const currentPos = startPos + travelDistance * progress;
 
         // 統一從上往下
