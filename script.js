@@ -599,9 +599,9 @@ async function doDraw() {
     ];
   } else if (noDelayPrizes12.includes(prizeValue)) {
     reelDurations = [
-      800 + fullRounds * 200,
-      800 + fullRounds * 200 ,
-      800 + fullRounds * 200
+      800 + fullRounds * 150,
+      800 + fullRounds * 150 ,
+      800 + fullRounds * 150
     ];
   } else if (noDelayPrizes56.includes(prizeValue)) {
     reelDurations = [
@@ -629,7 +629,7 @@ async function doDraw() {
     9: 1900,                      //8s
     10: 9000,                     //16s
     11: 9000,                     //16s
-    12: 80,                       //3s
+    12: 80,                       //2s
   };
 
 
@@ -1144,7 +1144,7 @@ function handleWinnerText(winner) {
     balance: 0
   });
 
-  if (prizeValue !== "7" && prizeValue !== "8" && prizeValue !== "12"){
+  if (prizeValue !== "5" && prizeValue !== "6" && prizeValue !== "7" && prizeValue !== "8" && prizeValue !== "12"){
     showWinnerEffect();
   };
   winnerLists.forEach(list => list.insertBefore(li.cloneNode(true), list.firstChild));
