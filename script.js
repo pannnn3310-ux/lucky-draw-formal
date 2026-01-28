@@ -585,7 +585,8 @@ async function doDraw() {
   const prizeValue = parseInt(dropdownButton.dataset.value) || 1;
   const fullRounds = getFullRounds(prizeValue);
 
-  const noDelayPrizes = [7, 8, 12];
+  const noDelayPrizes = [7, 8];
+  const noDelayPrizes12 = [12];
   const noDelayPrizes56 = [2, 3, 4, 5, 6, 9, 10, 11];
 
   let reelDurations;
@@ -595,6 +596,12 @@ async function doDraw() {
       800 + fullRounds * 200 + 3000,
       800 + fullRounds * 200 + 3000,
       800 + fullRounds * 200 + 3000
+    ];
+  } else if (noDelayPrizes12.includes(prizeValue)) {
+    reelDurations = [
+      800 + fullRounds * 200,
+      800 + fullRounds * 200 ,
+      800 + fullRounds * 200
     ];
   } else if (noDelayPrizes56.includes(prizeValue)) {
     reelDurations = [
