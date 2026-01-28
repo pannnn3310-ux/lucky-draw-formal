@@ -353,8 +353,11 @@ function startAutoScroll() {
   let lastTime = performance.now();
 
   function step(now) {
-    const delta = now - lastTime;
+    let delta = now - lastTime;
     lastTime = now;
+
+    const MAX_DELTA = 50; // 毫秒對應的滾動距離，越小越平滑
+    if (delta > MAX_DELTA) delta = MAX_DELTA;
 
     reels.forEach((reel, idx) => {
       const speed = ITEM_HEIGHT * 1;
