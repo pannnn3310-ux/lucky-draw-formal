@@ -369,4 +369,36 @@ ol, ul {
   -webkit-text-stroke: 5px rgb(255, 255, 255);
   paint-order: stroke;
   margin-left: 45%;
+}
+
+.bg-marquee {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 90%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.bg-marquee-track {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: bg-marquee 20s linear infinite;
+  color: #fff;
+  font-weight: bold;
+  font-size: 30px;
+  text-align: center;
+}
+
+@keyframes bg-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
 }/*# sourceMappingURL=all.css.map */
