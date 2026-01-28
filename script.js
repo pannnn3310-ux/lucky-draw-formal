@@ -232,17 +232,16 @@ function getFullRounds(prizeValue) {
   const roundsMap = {
     1: 15,
     2: 12,
-    3: 10,
-    4: 9,
-    5: 7,
-    6: 7,
-    7: 4,
-    8: 4,
+    3: 12,
+    4: 10,
+    5: 10,
+    6: 10,
+    7: 10,
+    8: 10,
     9: 3,
     10: 3,
-    11: 3,
-    12: 3,
-    13: 3,
+    11: 12,
+    12: 2,
   };
   return roundsMap[prizeValue] || 3;
 };
@@ -612,18 +611,18 @@ async function doDraw() {
   };
 
   const prizeExtraTimeMap = {
-    // 1: 30000, // 一獎            50s
-    2: 8000,  // ⭐ 二獎拉長 8 秒   17Ss
-    3: 3000,  // 三獎微拉           11s
-    4: 2000,                       //10s
-    5: 1000,                       //6s
-    6: 1000,                       //6s
-    7: 500,                        //5s
-    8: 500,                        //5s
-    9: 900,                        //9s
-    10: 900,                       //9s
-    11: 900,                       //9s
-    12: 900,                       //9s
+    // 1: 30000, // 一獎             50s
+    2: 8000,  // ⭐ 二獎拉長 8 秒    15Ss
+    3: 3000,  // 三獎微拉            10s
+    4: 3000,                      //10s
+    5: 3000,                      //10s
+    6: 3000,                      //10s
+    7: 3000,                      //10s
+    8: 3000,                      //10s
+    9: 900,                       //6s
+    10: 900,                       //6s
+    11: 8000,                      //15s
+    12: 50,                       //5s
   };
 
 
@@ -1138,7 +1137,7 @@ function handleWinnerText(winner) {
     balance: 0
   });
 
-  if (prizeValue !== "11" && prizeValue !== "12"){
+  if (prizeValue !== "7" && prizeValue !== "8" && prizeValue !== "11" && prizeValue !== "12"){
     showWinnerEffect();
   };
   winnerLists.forEach(list => list.insertBefore(li.cloneNode(true), list.firstChild));
