@@ -622,7 +622,7 @@ async function doDraw() {
     9: 1900,                      //8s
     10: 9000,                     //16s
     11: 9000,                     //16s
-    12: 50,                       //3s
+    12: 80,                       //3s
   };
 
 
@@ -1137,7 +1137,7 @@ function handleWinnerText(winner) {
     balance: 0
   });
 
-  if (prizeValue !== "7" && prizeValue !== "8" && prizeValue !== "11" && prizeValue !== "12"){
+  if (prizeValue !== "7" && prizeValue !== "8" && prizeValue !== "12"){
     showWinnerEffect();
   };
   winnerLists.forEach(list => list.insertBefore(li.cloneNode(true), list.firstChild));
