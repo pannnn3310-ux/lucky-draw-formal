@@ -553,9 +553,7 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
 
 
 // 抽獎
-
 async function doDraw() {
-
   //音效
   stopDrawSound();
   stopDrawSound1();
@@ -588,8 +586,8 @@ async function doDraw() {
   const prizeValue = parseInt(dropdownButton.dataset.value) || 1;
   const fullRounds = getFullRounds(prizeValue);
 
-  const noDelayPrizes = [7, 8];
-  const noDelayPrizes56 = [5, 6];
+  const noDelayPrizes = [7, 8, 12];
+  const noDelayPrizes56 = [2, 3, 4, 5, 6, 9, 10, 11];
 
   let reelDurations;
 
@@ -614,9 +612,9 @@ async function doDraw() {
   };
 
   const prizeExtraTimeMap = {
-    // 1: 30000, // 一獎（你已經在用） 50s
-    2: 8000,  // ⭐ 二獎拉長 8 秒     17s
-    3: 3000,  // 三獎微拉             11s
+    // 1: 30000, // 一獎            50s
+    2: 8000,  // ⭐ 二獎拉長 8 秒   17Ss
+    3: 3000,  // 三獎微拉           11s
     4: 2000,                       //10s
     5: 1000,                       //6s
     6: 1000,                       //6s
@@ -678,7 +676,7 @@ async function doDraw() {
     playDrawSound1();
     }, 1500);
 
-    // 暫停 + 動畫（你的淡出/彈入/空白邏輯）
+    // 暫停 + 動畫（淡出/彈入/空白邏輯）
     await freezeMidAnimation(midAnimationTime);
 
     // 第二段滾輪：分別啟動，每軸帶入小 delay 以產生依序停的感覺
@@ -1140,8 +1138,10 @@ function handleWinnerText(winner) {
     balance: 0
   });
 
+  if (prizeValue !== "11" && prizeValue !== "12"){
+    showWinnerEffect();
+  };
   winnerLists.forEach(list => list.insertBefore(li.cloneNode(true), list.firstChild));
-  showWinnerEffect();
   updateCounts();
   saveState();
 };
