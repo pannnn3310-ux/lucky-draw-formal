@@ -637,17 +637,25 @@ async function doDraw() {
 
   if (dropdownButton.dataset.value === "1") {
     playDrawSound();
-    const midAnimationTime = 1500; // 中間動畫
-    const firstHalfTime = 3000; // 第一段滾輪
-    // const secondHalfTime = totalTime - midAnimationTime - firstHalfTime; // 第二段滾輪剩下 5.5 秒
+    const midAnimationTime = 1500;
+    const firstHalfTime = 3000;
+
+    function getRandomNearbyIndex(targetIndex, totalItems, range = 5) {
+    // range 是可以偏移的最大項目數
+      const min = Math.max(0, targetIndex - range);
+      const max = Math.min(totalItems - 1, targetIndex + range);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+
+    const randomStopIndexes = reels.map((r, i) => getRandomNearbyIndex(reelTargetIndexes[i], r.items.length, 5));
 
     // 獎項1：分兩段滾輪 + 中間暫停動畫
     const halfRounds = Math.floor(fullRounds / 2);
 
     await Promise.all([
-      spinReel(reels[0], reelTargetIndexes[0], firstHalfTime, 0, halfRounds),
-      spinReel(reels[1], reelTargetIndexes[1], firstHalfTime, 0, halfRounds),
-      spinReel(reels[2], reelTargetIndexes[2], firstHalfTime, 0, halfRounds)
+      spinReel(reels[0], randomStopIndexes[0], firstHalfTime, 0, halfRounds),
+      spinReel(reels[1], randomStopIndexes[1], firstHalfTime, 0, halfRounds),
+      spinReel(reels[2], randomStopIndexes[2], firstHalfTime, 0, halfRounds)
     ]);
 
     // 只停一下（你要的「停格」）
@@ -745,6 +753,7 @@ async function doDraw() {
 };
 
 
+
 function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3) {
   return new Promise(resolve => {
     setTimeout(() => {
@@ -754,12 +763,12 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
       const viewportHeight = document.querySelector('.scroll-viewport').offsetHeight;
       const centerOffset = (viewportHeight / 2) - (ITEM_HEIGHT / 2);
 
+      // 統一從上往下
       const startPos = ((reel.position % totalHeight) + totalHeight) % totalHeight;
 
-      // 找正確的 target item
+      // 找目標 item
       const totalItems = reel.mapIndex.length;
       let reelTargetItemIndex = null;
-
       for (let i = 0; i < totalItems; i++) {
         if (reel.mapIndex[i] === targetIndex && i * ITEM_HEIGHT >= startPos) {
           reelTargetItemIndex = i;
@@ -776,12 +785,20 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
       };
 
       const targetPos = reelTargetItemIndex * ITEM_HEIGHT;
+
+      // travelDistance 保留 fullRounds
       const travelDistance = totalHeight * fullRounds + (targetPos - startPos);
+
+      // easing 函數：前快-中慢-後快
+      function easeInOutTriple(t) {
+        if (t < 0.2) return t * 3 * 0.5;           // 前快
+        if (t < 0.7) return 0.3 + (t - 0.2) * 0.4; // 中慢
+        return 0.7 + (t - 0.7) * 0.3 / 0.3;       // 後快
+      };
 
       function animate(now) {
         let t = (now - startTime) / duration;
         if (t >= 1) {
-          // ✅ 直接瞬間鎖格（完全不做 easing）
           const finalTransform = targetPos - centerOffset;
           reel.el.style.transform = `translateY(-${finalTransform}px)`;
           reel.position = finalTransform;
@@ -790,10 +807,10 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
           return;
         };
 
-        // 這裡你可以用 linear / easeIn / 自己的速度曲線
-        const progress = t; // 👈 重點：不要用 easeOut
+        const progress = easeInOutTriple(t);
         const currentPos = startPos + travelDistance * progress;
 
+        // 統一從上往下
         const displayPos = ((currentPos % totalHeight) + totalHeight) % totalHeight;
         reel.el.style.transform = `translateY(-${displayPos}px)`;
         reel.position = displayPos;
@@ -805,7 +822,6 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
     }, delay);
   });
 };
-
 
 
 
