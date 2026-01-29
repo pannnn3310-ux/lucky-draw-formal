@@ -472,7 +472,36 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
       return;
     };
 
+
+    const prizeLimits = {
+      "1": 1,   // 一獎：只能抽 1 人
+      "2": 2,   // 二獎：可抽 2 人
+      "3": 3,   // 三獎：可抽 3 人
+      "4": 4,
+      "5": 5,
+      "6": 6,
+      "7": 7,
+      "8": 8,
+      "9": Infinity,  // 幸運分享獎不限
+      "10": Infinity, // 加碼獎不限
+      "11": Infinity, // 額外獎不限
+      "12": 10,
+      "13": 1
+    };
+
     const selectedPrize = dropdownButton.dataset.value;
+    const drawnCount = winnerData.filter(w => w.prize === prizeText.textContent).length;
+    const maxCount = prizeLimits[selectedPrize] ?? 0;
+
+    const listToast = document.querySelector('#list-toast-body');
+    const toastElement = document.querySelector('#list-toast');
+
+    if (drawnCount >= maxCount) {
+      listToast.innerHTML = `<p class="m-0">獎項已全數抽完！</p>`;
+      const toast = new bootstrap.Toast(toastElement);
+      toast.show();
+      return;
+    };
 
     // 9獎防呆：分享人 & 分享金額
     if (selectedPrize === "9") {
