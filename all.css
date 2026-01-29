@@ -204,7 +204,6 @@ ol, ul {
 }
 
 #prize-btn + .dropdown-menu {
-  width: 20%;
   left: 50% !important;
   top: 100% !important;
   font-size: 20px;

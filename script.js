@@ -144,7 +144,6 @@ const prizeAmounts = {
 };
 
 
-
 const ITEM_HEIGHT = 90;
 
 //設定拉霸三軸
@@ -242,6 +241,7 @@ function getFullRounds(prizeValue) {
     10: 12,
     11: 12,
     12: 2,
+    13: 12,
   };
   return roundsMap[prizeValue] || 3;
 };
@@ -379,6 +379,16 @@ function stopAutoScroll() {
   cancelAnimationFrame(autoScrollId);
   autoScrollId = null;
 };
+
+//input禁止手輸入
+
+specialPrizeInput2.addEventListener('change', () => {
+  const valid = Array.from(datalist.options).some(option => option.value === input.value);
+  if (!valid) {
+    alert('請從名單中選擇有效的人！');
+    input.value = ''; // 清空非法輸入
+  }
+});
 
 // 下拉選單
 dropdownItems.forEach(item => {
@@ -587,7 +597,7 @@ async function doDraw() {
 
   const noDelayPrizes = [7, 8];
   const noDelayPrizes12 = [12];
-  const noDelayPrizes56 = [2, 3, 4, 5, 6, 9, 10, 11];
+  const noDelayPrizes56 = [2, 3, 4, 5, 6, 9, 10, 11,13];
 
   let reelDurations;
 
@@ -630,6 +640,7 @@ async function doDraw() {
     10: 9000,                     //16s
     11: 9000,                     //16s
     12: 80,                       //2s
+    13: 9000,                     //16s
   };
 
 
@@ -1068,6 +1079,9 @@ function handleWinnerText(winner) {
     specialBonusText = specialPrizeAmountInput.value
       ? `${Number(specialPrizeAmountInput.value).toLocaleString()}`
       : "";
+  } else if (prizeValue === "13") {
+    companyPrizeValue = 0;
+    specialBonusValue = 3000;
   };
 
 
@@ -1107,6 +1121,9 @@ function handleWinnerText(winner) {
       <p>${displayText}【金額：${specialBonusText}】：${prizeAmountsText}</p>
       <p style="color:#D67158;">【${bonus2Text}】</p>
     `;
+  } else if (prizeValue === "13") {
+        li.innerHTML = `
+      <p>${displayText}【金額：${specialBonusValue}】：${prizeAmountsText}</p>`;
   } else {
     li.innerHTML = `
       <p>${displayText}${prizeAmountsText}</p>
