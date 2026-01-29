@@ -400,4 +400,7 @@ ol, ul {
   to {
     transform: translateX(-100%);
   }
+}
+.p-6 {
+  padding-top: 80px;
 }/*# sourceMappingURL=all.css.map */

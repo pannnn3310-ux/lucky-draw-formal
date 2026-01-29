@@ -497,7 +497,7 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
     const toastElement = document.querySelector('#list-toast');
 
     if (drawnCount >= maxCount) {
-      listToast.innerHTML = `<p class="m-0">獎項已全數抽完！</p>`;
+      listToast.innerHTML = `<p class="m-0 MT">獎項已全數抽完！</p>`;
       const toast = new bootstrap.Toast(toastElement);
       toast.show();
       return;
