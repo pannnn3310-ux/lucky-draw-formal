@@ -9,7 +9,7 @@ html, body {
 
 body {
   margin: 0;
-  background-color: #9A0F15;
+  background-color: #1E2A38;
 }
 
 /* 全視覺背景 */
@@ -20,8 +20,12 @@ body::before {
   z-index: -1;
 
   background-image:
-    linear-gradient(#751516, rgba(34, 34, 34, 0.46)),
-    url('Pngtree—japanese year of the horse_23201614.png');
+      linear-gradient(
+      180deg,
+      rgba(30, 42, 56, 0.92),
+      rgba(74, 94, 113, 0.75)
+    ),
+    url('Standar-Logo-with-Tagline-Horizontal.jpg');
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
   background-size: cover;
@@ -65,12 +69,17 @@ ol, ul {
   z-index: 10;
   overflow: hidden;
   background: #F5DA6C;
-  background: linear-gradient(0deg,rgba(245, 218, 108, 1) 0%, rgba(248, 187, 113, 1) 67%, rgba(255, 178, 122, 1) 100%, rgba(255, 196, 126, 1) 15%);
+  background: linear-gradient(
+    180deg,
+    #F2D37A 0%,
+    #EFC07A 60%,
+    #E6A96E 100%
+  );
   border: 2px solid #fff9c7;
   border-radius: 20px;
   box-shadow:
-    15px 10px 20px 5px #3d0202,
-    inset 0 3px 6px rgb(255, 205, 143);
+    0 10px 25px rgba(0,0,0,0.35),
+    inset 0 2px 4px rgba(255, 255, 255, 0.25);
     &::before {
       content: "";
       position: absolute;
@@ -166,7 +175,7 @@ ol, ul {
       height: 70px;
       top: -30px;
       left: -22px;
-      background: linear-gradient(30deg, #d62828 40%, #ff705e 100%);
+      background: linear-gradient(30deg, #D64545 40%, #FF7A6A 100%);
       border: 1px solid #fa6b6b;
       border-radius: 50%;
       transition: top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
