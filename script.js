@@ -474,19 +474,19 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
 
 
     const prizeLimits = {
-      "1": 1,   // 一獎：只能抽 1 人
-      "2": 2,   // 二獎：可抽 2 人
-      "3": 3,   // 三獎：可抽 3 人
-      "4": 4,
-      "5": 5,
-      "6": 6,
-      "7": 7,
-      "8": 8,
+      "1": 2,         // 一獎
+      "2": 2,         // 二獎
+      "3": 2,         // 三獎
+      "4": 2,         // 四獎
+      "5": 5,         // 五獎
+      "6": 6,         // 六獎
+      "7": 7,         // 七獎
+      "8": 8,         // 八獎
       "9": Infinity,  // 幸運分享獎不限
-      "10": Infinity, // 加碼獎不限
-      "11": Infinity, // 額外獎不限
-      "12": 10,
-      "13": 1
+      "10": Infinity, // 現金加碼獎不限
+      "11": Infinity, // 特別追加獎不限
+      "12": 7,        // 追加獎
+      "13": 2         // 東莞大寶-熱情贊助獎
     };
 
     const selectedPrize = dropdownButton.dataset.value;
@@ -1139,7 +1139,7 @@ function handleWinnerText(winner) {
   if (prizeValue === "9") {
     li.innerHTML = `
       <p>${prizeName}${displayLine}：${prizeAmountsText}</p>
-      <p style="color:#D67158;">【${bonusText}-幸運分享】</p>
+      <p style="color:#D64545;">【${bonusText}-幸運分享】</p>
     `;
   } else if (prizeValue === "11") {
         li.innerHTML = `
@@ -1148,7 +1148,7 @@ function handleWinnerText(winner) {
   } else if (prizeValue === "10") {
     li.innerHTML = `
       <p>${displayText}【金額：${specialBonusText}】：${prizeAmountsText}</p>
-      <p style="color:#D67158;">【${bonus2Text}】</p>
+      <p style="color:#D64545;">【${bonus2Text}】</p>
     `;
   } else if (prizeValue === "13") {
         li.innerHTML = `
@@ -1511,8 +1511,8 @@ function saveState() {
       };
 
       let bonusLine = '';
-      if (w.bonusSource) bonusLine = `<p style="color:#D67158;">【${w.bonusSource}-幸運分享】</p>`;
-      else if (w.bonus2Source) bonusLine = `<p style="color:#D67158;">【${w.bonus2Source}】</p>`;
+      if (w.bonusSource) bonusLine = `<p style="color:#D64545;">【${w.bonusSource}-幸運分享】</p>`;
+      else if (w.bonus2Source) bonusLine = `<p style="color:#D64545;">【${w.bonus2Source}】</p>`;
 
       li.innerHTML = `
         <p>${w.prize}${displayLine}：${w.dept} - ${w.name}</p>
