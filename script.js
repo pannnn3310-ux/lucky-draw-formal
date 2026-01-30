@@ -129,6 +129,14 @@ document.addEventListener('click', e => {
   };
 });
 
+document.getElementById('show-winners-btn').addEventListener('click', () => {
+  // 轉成 JSON 字串，放到 URL 或 localStorage
+  localStorage.setItem('winnerData', JSON.stringify(winnerData));
+
+  // 開新頁面
+  window.open('winnersData.html', '_blank');
+});
+
 
 // 1~8獎的固定金額
 const prizeAmounts = {
@@ -1184,6 +1192,8 @@ function handleWinnerText(winner) {
     id: winner.id,
     name: winner.name,
     prize: prizeText.textContent,
+    prizeValue: parseInt(dropdownButton.dataset.value, 10),
+    drawOrder: winnerData.length,
     bonusSource: bonusText,
     prizeAmounts: companyPrizeValue,
     specialBonus: specialBonusValue,
