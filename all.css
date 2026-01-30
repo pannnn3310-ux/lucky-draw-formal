@@ -54,7 +54,7 @@ ol, ul {
   height: 400px;
   position: relative;
   z-index: 10;
-  overflow: visible;
+  overflow: hidden;
   background: linear-gradient(180deg, #F8D97E 0%, #F4C27A 60%, #f7c188 100%);
   border: 2px solid #fff9c7;
   border-radius: 20px;
@@ -406,13 +406,4 @@ ol, ul {
 }
 .p-6 {
   padding-top: 80px;
-}
-
-@keyframes slot-glow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.2), 0 0 10px rgba(255, 255, 255, 0.3), 0 0 15px rgba(255, 255, 255, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4);
-  }
 }/*# sourceMappingURL=all.css.map */
