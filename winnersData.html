@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 <body>
   <div class="main my-5">
+    <audio id="bgm" src="./music/runrunman.mp3" loop preload="auto"></audio>
       <div class="container">
           <div class="row">
               <div class="col-2 smore-img"></div>
@@ -46,7 +47,9 @@
     background-size: cover;
   }
   .smore-img {
-    position: relative;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     width: 100%;
     height: 300px;
     background-image:
@@ -69,7 +72,7 @@
     position: absolute;
     content: '中獎名單';
     top: 30%;
-    left: 40%;
+    left: 36%;
     font-size: 100px;
     font-weight: 600;
     color: #eee;
@@ -130,6 +133,34 @@ li span {
       `;
       list.appendChild(li);
   });
+
+  const bgm = document.getElementById('bgm');
+
+  bgm.volume = 0;          // 起始音量 0
+  const targetVolume = 1; // 最終音量（自己調，0~1）
+  const fadeDuration = 3000; // 淡入時間（毫秒）
+
+  function fadeInMusic() {
+    bgm.play().catch(() => {
+    });
+
+    const stepTime = 50;
+    const step = targetVolume / (fadeDuration / stepTime);
+
+    const fadeInterval = setInterval(() => {
+      if (bgm.volume < targetVolume) {
+        bgm.volume = Math.min(bgm.volume + step, targetVolume);
+      } else {
+        clearInterval(fadeInterval);
+      }
+    }, stepTime);
+  }
+
+  document.addEventListener('click', function startOnce() {
+    fadeInMusic();
+    document.removeEventListener('click', startOnce);
+  });
+
 </script>
 
 </body>
