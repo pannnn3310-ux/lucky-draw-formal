@@ -632,6 +632,24 @@ async function doDraw() {
   const prizeValue = parseInt(dropdownButton.dataset.value) || 1;
   const fullRounds = getFullRounds(prizeValue);
 
+  // ===【新增】本次抽獎「統一滾動距離」===
+  const baseReel = reels[0];
+  const baseTotalHeight = ITEM_HEIGHT * baseReel.items.length;
+
+  // 找第一個可用的 target item（只算一次）
+  let unifiedTargetItemIndex = 0;
+  for (let i = 0; i < baseReel.mapIndex.length; i++) {
+    if (baseReel.mapIndex[i] === winnerIndex) {
+      unifiedTargetItemIndex = i;
+      break;
+    }
+  }
+
+  // 統一距離（所有軸都用這個）
+  const unifiedTravelDistance =
+    baseTotalHeight * fullRounds +
+    unifiedTargetItemIndex * ITEM_HEIGHT;
+
   const noDelayPrizes = [7, 8];
   const noDelayPrizes12 = [12];
   const noDelayPrizes56 = [2, 3, 4, 5, 6, 9, 10, 11,13];
@@ -767,17 +785,17 @@ async function doDraw() {
   } else {
     playDrawSound();
     // 其他獎項保持原流程
-    const p0 = spinReel(reels[0], reelTargetIndexes[0], reelDurations[0], 0, fullRounds)
+    const p0 = spinReel(reels[0], reelTargetIndexes[0], reelDurations[0], 0, fullRounds, unifiedTravelDistance)
       .then(() => {
         highlightReel(0)
         playDon();
       });
-    const p1 = spinReel(reels[1], reelTargetIndexes[1], reelDurations[1], 0, fullRounds)
+    const p1 = spinReel(reels[1], reelTargetIndexes[1], reelDurations[1], 0, fullRounds, unifiedTravelDistance)
       .then(() => {
         highlightReel(1)
         playDon();
       });
-    const p2 = spinReel(reels[2], reelTargetIndexes[2], reelDurations[2], 0, fullRounds)
+    const p2 = spinReel(reels[2], reelTargetIndexes[2], reelDurations[2], 0, fullRounds, unifiedTravelDistance)
       .then(() => {
         highlightReel(2)
         playDon();
@@ -804,7 +822,7 @@ async function doDraw() {
 
 
 
-function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3) {
+function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3, unifiedTravelDistance = null) {
   return new Promise(resolve => {
     setTimeout(() => {
       const startTime = performance.now();
@@ -837,7 +855,12 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3)
       const targetPos = reelTargetItemIndex * ITEM_HEIGHT;
 
       // travelDistance 保留 fullRounds
-      const travelDistance = totalHeight * fullRounds + (targetPos - startPos);
+      // const travelDistance = totalHeight * fullRounds + (targetPos - startPos);
+      const travelDistance =
+        unifiedTravelDistance !== null
+          ? unifiedTravelDistance
+          : totalHeight * fullRounds + (targetPos - startPos);
+
 
       // easing 函數：前快-中慢-後快
       function easeInOutTriple(t) {
