@@ -148,7 +148,7 @@ const prizeAmounts = {
   6: 7000,
   7: 6000,
   8: 5000,
-  12: 3000
+  12: 3600
 };
 
 
@@ -482,18 +482,18 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
 
 
     const prizeLimits = {
-      "1": 2,         // 一獎
-      "2": 2,         // 二獎
-      "3": 2,         // 三獎
-      "4": 2,         // 四獎
-      "5": 5,         // 五獎
-      "6": 6,         // 六獎
-      "7": 7,         // 七獎
-      "8": 8,         // 八獎
+      "1": 1,         // 一獎
+      "2": 1,         // 二獎
+      "3": 1,         // 三獎
+      "4": 1,         // 四獎
+      "5": 2,         // 五獎
+      "6": 2,         // 六獎
+      "7": 6,         // 七獎
+      "8": 6,         // 八獎
       "9": Infinity,  // 幸運分享獎不限
       "10": Infinity, // 現金加碼獎不限
       "11": Infinity, // 特別追加獎不限
-      "12": 7,        // 追加獎
+      "12": 15,        // 追加獎
       "13": 2         // 東莞大寶-熱情贊助獎
     };
 
@@ -1118,7 +1118,7 @@ function handleWinnerText(winner) {
       : "";
   } else if (prizeValue === "13") {
     companyPrizeValue = 0;
-    specialBonusValue = 3000;
+    specialBonusValue = 9000;
   };
 
 
@@ -1169,9 +1169,13 @@ function handleWinnerText(winner) {
 
   const isSharePrize = prizeValue === "9"
 
-  let shareToId = isSharePrize
-  ? specialPrizeInput.dataset.id || null
-  : null;
+  let shareToId = null;
+  let shareToName = null;
+
+  if (isSharePrize) {
+    shareToId = specialPrizeInput.dataset.id || null;
+    shareToName = specialPrizeInput.value?.trim() || null;
+  };
 
   if (isSharePrize && shareToId) {
     // 透過輸入值找到被分享的中獎人
@@ -1199,6 +1203,7 @@ function handleWinnerText(winner) {
     specialBonus: specialBonusValue,
     bonus2Source: bonus2Text,
     shareToId,
+    shareToName,
     shareAmount: isSharePrize ? Number(specialPrizeAmountInput.value || 0) : 0,
     shareToIndex: isSharePrize ? winnerData.length - 1 : null,
     balance: 0

@@ -14,7 +14,24 @@
     <audio id="bgm" src="./music/runrunman.mp3" loop preload="auto"></audio>
       <div class="container">
           <div class="row">
-              <div class="col-2 smore-img"></div>
+              <div class="col-2 smore-img">
+                <div class="prize-tabs ">
+                  <button data-prize="all" class="activebtn btn btn-light">全部</button>
+                  <button data-prize="1" class="btn btn-light">頭獎</button>
+                  <button data-prize="2" class="btn btn-light">二獎</button>
+                  <button data-prize="3" class="btn btn-light">三獎</button>
+                  <button data-prize="4" class="btn btn-light">四獎</button>
+                  <button data-prize="5" class="btn btn-light">五獎</button>
+                  <button data-prize="6" class="btn btn-light">六獎</button>
+                  <button data-prize="7" class="btn btn-light">七獎</button>
+                  <button data-prize="8" class="btn btn-light">八獎</button>
+                  <button data-prize="9" class="btn btn-light">幸運分享獎</button>
+                  <button data-prize="10" class="btn btn-light">現金加碼獎</button>
+                  <button data-prize="12" class="btn btn-light">追加獎</button>
+                  <button data-prize="11" class="btn btn-light">特別追加獎</button>
+                  <button data-prize="13" class="btn btn-light">東莞大寶-熱情贊助獎</button>
+                </div>
+              </div>
               <div class="col-12 d-flex justify-content-center align-items-center bg-light p-5">
                   <ul id="winner-list"
                   class="fs-3 "></ul>
@@ -24,65 +41,35 @@
   </div>
 
 <style>
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
 
-    background-image:
-        radial-gradient(
-        circle at center,
-        rgba(255,255,255,0.03),
-        rgba(255,255,255,0) 50%
-        ),
-        linear-gradient(
-        180deg,
-        rgba(30,42,56,0.9),
-        rgba(74,94,113,0.7)
-        ),
-        url('prizeimg.jpg');
-    background-repeat: no-repeat, no-repeat;
-    background-position: center, center;
-    background-size: cover;
-  }
-  .smore-img {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    width: 100%;
-    height: 300px;
-    background-image:
+  background-image:
       radial-gradient(
-        circle at center,
-        rgba(189, 7, 7, 0.03),
-        rgba(234, 182, 182, 0) 50%
-        ),
-        linear-gradient(
-        180deg,
-        rgba(30,42,56,0.9),
-        rgba(94, 105, 114, 0.7)
-        ),
-    url('happynewyear.jpg');
-    background-repeat: no-repeat, no-repeat;
-    background-position: center, center;
-    background-size: cover;
-  }
-  .smore-img::before {
-    position: absolute;
-    content: '中獎名單';
-    top: 30%;
-    left: 36%;
-    font-size: 100px;
-    font-weight: 600;
-    color: #eee;
-  }
+      circle at center,
+      rgba(255,255,255,0.03),
+      rgba(255,255,255,0) 50%
+      ),
+      linear-gradient(
+      180deg,
+      rgba(30,42,56,0.9),
+      rgba(74,94,113,0.7)
+      ),
+      url('prizeimg.jpg');
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+  background-size: cover;
+}
+
 ul {
   margin: 0;
   padding: 0;
   list-style: none;
   width: 100%;
-}
+  }
 
 li {
   display: flex;
@@ -95,11 +82,47 @@ li span {
   display: inline-block;
 }
 
+.smore-img {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 400px;
+  background-image:
+    radial-gradient(
+      circle at center,
+      rgba(189, 7, 7, 0.03),
+      rgba(234, 182, 182, 0) 50%
+      ),
+      linear-gradient(
+      180deg,
+      rgba(30,42,56,0.9),
+      rgba(94, 105, 114, 0.7)
+      ),
+  url('happynewyear.jpg');
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
+  background-size: cover;
+}
+.smore-img::before {
+  position: absolute;
+  content: '中獎名單';
+  top: 30%;
+  left: 36%;
+  font-size: 100px;
+  font-weight: 600;
+  color: #eee;
+}
 
-.left-col {
-  flex: 0 0 550px;
-  font-weight: bold;
-  color: #d32f2f;
+.prize-tabs {
+  position: absolute;
+  bottom: 3%;
+  button {
+    font-size: 20px;
+    font-weight: 500;
+    padding: 8px;
+    margin: 0 3px;
+  }
 }
 
 .right-col {
@@ -107,6 +130,13 @@ li span {
   justify-content: end;
   flex: 1;
   text-align: left;
+}
+
+.center-col {
+  display: flex;
+  justify-content: end;
+  flex: 1;
+  text-align: end;
 }
 </style>
 <script>
@@ -116,22 +146,6 @@ li span {
   winnerData.sort((a, b) => {
       if (a.prizeValue !== b.prizeValue) return a.prizeValue - b.prizeValue;
       return a.drawOrder - b.drawOrder;
-  });
-
-  winnerData.forEach(w => {
-      const li = document.createElement('li');
-
-      const leftText = `${w.specialBonus ?  + w.specialBonus + '' : ''}`;
-
-      const prizeValueText = `${w.prizeAmounts ?  + w.prizeAmounts + '' : ''}`;
-
-      const rightText = `${w.dept} - ${w.name}`;
-
-      li.innerHTML = `
-        <span class="left-col">${w.prize}【金額：${prizeValueText}${leftText}】：</span>
-        <span class="right-col">${rightText}</span>
-      `;
-      list.appendChild(li);
   });
 
   const bgm = document.getElementById('bgm');
@@ -160,6 +174,55 @@ li span {
     fadeInMusic();
     document.removeEventListener('click', startOnce);
   });
+
+function renderList(data) {
+  list.innerHTML = '';
+
+  data.forEach(w => {
+    const li = document.createElement('li');
+
+    const bonusText = w.specialBonus ? `  ${w.specialBonus}` : '';
+    const amountText = w.prizeAmounts ? w.prizeAmounts : '';
+
+    const shareHTML = (w.prizeValue === 9 && w.shareToName)
+    ? `<div class="left-col">分享人：${w.shareToName}</div>`
+    : '';
+
+    li.innerHTML = `
+      <span class="left-col">
+        ${w.prize}【金額：${amountText}${bonusText}】
+      </span>
+      <span class="center-col">${shareHTML}</span>
+      <span class="right-col">
+        ${w.dept} - ${w.name}
+      </span>
+    `;
+    list.appendChild(li);
+  });
+}
+const buttons = document.querySelectorAll('.prize-tabs button');
+
+buttons.forEach(btn => {
+  btn.addEventListener('click', () => {
+
+    buttons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const prize = btn.dataset.prize;
+
+    if (prize === 'all') {
+      renderList(winnerData);
+    } else {
+      const filtered = winnerData.filter(
+        w => w.prizeValue === Number(prize)
+      );
+      renderList(filtered);
+    }
+  });
+});
+renderList(winnerData);
+
+
 
 </script>
 
