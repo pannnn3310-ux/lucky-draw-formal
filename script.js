@@ -255,21 +255,32 @@ function getFullRounds(prizeValue) {
 };
 
 
-function populateReels() {
+function populateReels(prizeValue) {
   reels.forEach(r => {
     r.el.innerHTML = '';
     r.items = [];
     r.mapIndex = [];
+    r.position = 0;
   });
 
-  const minReelLength = 15;
-  const allLength = allNames.length;
+  const rounds = getFullRounds(prizeValue);
+  const baseLength = allNames.length;
 
-  // 若名單比最小長度短，計算需要補多少
-  const padCount = Math.max(0, Math.floor((minReelLength - allLength) / 2));
+  const MIN_TOTAL = Math.max(
+    rounds * baseLength,
+    baseLength * 5
+  );
 
-  // ===== 主名單 =====
-  allNames.forEach((p, i) => {
+  // 統一用一份index序列
+  const indexSequence = [];
+  for (let i = 0; i < MIN_TOTAL; i++) {
+    indexSequence.push(i % baseLength);
+  }
+
+  // 依序灌入三軸
+  indexSequence.forEach(idx => {
+    const p = allNames[idx];
+
     reels.forEach((r, reelIndex) => {
       const div = document.createElement('div');
       div.className = 'symbol';
@@ -280,75 +291,10 @@ function populateReels() {
 
       r.el.appendChild(div);
       r.items.push(div);
-      r.mapIndex.push(i);
-    });
-  });
-
-
-  if (padCount > 0) {
-    reels.forEach((r, reelIndex) => {
-      for (let i = 0; i < padCount; i++) {
-        // 前補（從尾巴往前取）
-        const beforeIndex = (allLength - padCount + i) % allLength;
-        const beforePerson = allNames[beforeIndex];
-        const divBefore = document.createElement('div');
-        divBefore.className = 'symbol';
-        divBefore.textContent =
-          reelIndex === 0 ? beforePerson.dept :
-          reelIndex === 1 ? beforePerson.id :
-          beforePerson.name;
-
-        r.el.insertBefore(divBefore, r.el.firstChild);
-        r.items.unshift(divBefore);
-        r.mapIndex.unshift(beforeIndex);
-
-        // 後補
-        const afterIndex = i % allLength;
-        const afterPerson = allNames[afterIndex];
-        const divAfter = document.createElement('div');
-        divAfter.className = 'symbol';
-        divAfter.textContent =
-          reelIndex === 0 ? afterPerson.dept :
-          reelIndex === 1 ? afterPerson.id :
-          afterPerson.name;
-
-        r.el.appendChild(divAfter);
-        r.items.push(divAfter);
-        r.mapIndex.push(afterIndex);
-      };
-    });
-  };
-};
-
-
-
-function ensureReelLoop(reel, reelIndex) {
-  const viewportHeight = document.querySelector('.scroll-viewport').offsetHeight;
-  const threshold = ITEM_HEIGHT * 3; // 提前3筆追加
-  if (reel.position + viewportHeight > reel.items.length * ITEM_HEIGHT - threshold) {
-    appendReelItems(reel.items.length);
-  };
-};
-
-function appendReelItems(startIndex) {
-  reels.forEach(r => {
-    const total = allNames.length;
-    // 每軸追加 ITEM_HEIGHT 高度的元素
-    for (let i = startIndex; i < startIndex + 3; i++) {
-      const idx = i % total;
-      const p = allNames[idx];
-      const div = document.createElement('div');
-      div.className = 'symbol';
-      // 依軸選顯示
-      div.textContent = r.el === reels[0].el ? p.dept
-                        : r.el === reels[1].el ? p.id
-                        : p.name;
-      r.el.appendChild(div);
-      r.items.push(div);
       r.mapIndex.push(idx);
-    };
+    });
   });
-};
+}
 
 
 
@@ -370,7 +316,6 @@ function startAutoScroll() {
       const speed = ITEM_HEIGHT * 1;
       reel.position += speed * (delta / 1000);
 
-      ensureReelLoop(reel, idx); // 傳入 reelIndex
 
       const totalHeight = ITEM_HEIGHT * reel.items.length;
       reel.el.style.transform = `translateY(-${reel.position % totalHeight}px)`;
@@ -388,15 +333,21 @@ function stopAutoScroll() {
   autoScrollId = null;
 };
 
-//input禁止手輸入
 
+//input禁止手輸入
 specialPrizeInput2.addEventListener('change', () => {
-  const valid = Array.from(datalist.options).some(option => option.value === input.value);
+  const datalist = document.querySelector('#special-prize-list');
+  const value = specialPrizeInput2.value;
+
+  const valid = Array.from(datalist.options)
+    .some(option => option.value === value);
+
   if (!valid) {
     alert('請從名單中選擇有效的人！');
-    input.value = ''; // 清空非法輸入
+    specialPrizeInput2.value = '';
   }
 });
+
 
 // 下拉選單
 dropdownItems.forEach(item => {
@@ -1242,88 +1193,88 @@ function handleWinnerText(winner) {
 
 
 // 清除中獎者
-winnerLists.forEach(list => {
-  list.addEventListener('click', e => {
-    if (!e.target.classList.contains('remove-btn')) return;
+// winnerLists.forEach(list => {
+//   list.addEventListener('click', e => {
+//     if (!e.target.classList.contains('remove-btn')) return;
 
-    const li = e.target.closest('li');
-    if (!li) return;
+//     const li = e.target.closest('li');
+//     if (!li) return;
 
-    const key = li.dataset.key;
+//     const key = li.dataset.key;
 
-    // ======== 啟動「刪除確認 Toast」 ========
-    const confirmBody = document.querySelector('#confirm-toast-body');
-    confirmBody.innerHTML  = `
-    <div class="text-center"
-      <p>確定要移除<span class="text-danger">工號：${key}</span>嗎？</p>
-      <p>移除後會回到抽獎名單內。</p>
-    </div>`
-    ;
+//     // ======== 啟動「刪除確認 Toast」 ========
+//     const confirmBody = document.querySelector('#confirm-toast-body');
+//     confirmBody.innerHTML  = `
+//     <div class="text-center">
+//       <p>確定要移除<span class="text-danger">工號：${key}</span>嗎？</p>
+//       <p>移除後會回到抽獎名單內。</p>
+//     </div>`
+//     ;
 
-    const confirmToastEl = document.querySelector('#confirm-toast');
-    const confirmToast = new bootstrap.Toast(confirmToastEl);
-    confirmToast.show();
+//     const confirmToastEl = document.querySelector('#confirm-toast');
+//     const confirmToast = new bootstrap.Toast(confirmToastEl);
+//     confirmToast.show();
 
-    const yesBtn = document.querySelector('#confirm-yes');
-    const noBtn = document.querySelector('#confirm-no');
+//     const yesBtn = document.querySelector('#confirm-yes');
+//     const noBtn = document.querySelector('#confirm-no');
 
-    const cleanup = () => {
-      yesBtn.onclick = null;
-      noBtn.onclick = null;
-    };
+//     const cleanup = () => {
+//       yesBtn.onclick = null;
+//       noBtn.onclick = null;
+//     };
 
-    yesBtn.onclick = () => {
-      cleanup();
-      confirmToast.hide();
+//     yesBtn.onclick = () => {
+//       cleanup();
+//       confirmToast.hide();
 
-      const index = winnerData.findIndex(
-        w => w.id === key
-      );
+//       const index = winnerData.findIndex(
+//         w => w.id === key
+//       );
 
-      if (index === -1) return;
+//       if (index === -1) return;
 
-      const record = winnerData[index];
+//       const record = winnerData[index];
 
-      // 如果刪的是「分享事件」，要回扣 balance
-      if (record.shareToId) {
-        const target = winnerData.find(w => w.id === record.shareToId);
-        if (target) {
-          target.balance = (target.balance || 0) - (record.shareAmount || 0);
-        };
-      };
+//       // 如果刪的是「分享事件」，要回扣 balance
+//       if (record.shareToId) {
+//         const target = winnerData.find(w => w.id === record.shareToId);
+//         if (target) {
+//           target.balance = (target.balance || 0) - (record.shareAmount || 0);
+//         };
+//       };
 
 
-    // 移除該筆資料（不能用 filter）
-    winnerData.splice(index, 1);
+//     // 移除該筆資料（不能用 filter）
+//     winnerData.splice(index, 1);
 
-    // 從已中獎名單移除
-    drawnWinners.delete(record.id);
-    //存檔
-    saveState();
+//     // 從已中獎名單移除
+//     drawnWinners.delete(record.id);
+//     //存檔
+//     saveState();
 
-    // 刪畫面
-    li.remove();
+//     // 刪畫面
+//     li.remove();
 
-    updateCounts();
+//     updateCounts();
 
-  // 成功 Toast
-    const successBody = document.querySelector('#success-toast-body');
-    successBody.innerHTML =
-      `<p class="m-0" <span class="text-danger">工號：${key}</span>已從中獎名單移除，可以再次抽到</p>`;
+//   // 成功 Toast
+//     const successBody = document.querySelector('#success-toast-body');
+//     successBody.innerHTML =
+//       `<p class="m-0" <span class="text-danger">工號：${key}</span>已從中獎名單移除，可以再次抽到</p>`;
 
-    const successToastEl = document.querySelector('#success-toast');
-    const successToast = new bootstrap.Toast(successToastEl);
-    successToast.show();
-    };
+//     const successToastEl = document.querySelector('#success-toast');
+//     const successToast = new bootstrap.Toast(successToastEl);
+//     successToast.show();
+//     };
 
-    // === 按下「取消」 ===
-    noBtn.onclick = () => {
-      cleanup();
-      confirmToast.hide();
-    };
+//     // === 按下「取消」 ===
+//     noBtn.onclick = () => {
+//       cleanup();
+//       confirmToast.hide();
+//     };
 
-  });
-});
+//   });
+// });
 
 //同步抓取前後端資料
 function updateCounts() {
@@ -1557,7 +1508,11 @@ function saveState() {
         ${bonusLine}
       `;
 
-      winnerLists.forEach(list => list.appendChild(li.cloneNode(true)));
+      winnerLists.forEach(list => {
+        const clone = li.cloneNode(true);
+        list.appendChild(clone);
+      });
+
     };
 
     updateCounts();
@@ -1575,13 +1530,13 @@ function saveState() {
 clearAllBtn.addEventListener('click', () => {
   if (winnerData.length === 0) return;
 
-  // 顯示確認 toast
   const confirmBody = document.querySelector('#confirm-toast-body');
-  confirmBody.innerHTML  = `
-  <div class="text-center"
-    <p>確定要移除<span class="text-danger">所有歷史名單</span>嗎？</p>
-    <p>刪除後無法復原！</p>
-  </div>`;
+  confirmBody.innerHTML = `
+    <div class="text-center">
+      <p>確定要移除<span class="text-danger">所有歷史名單</span>嗎？</p>
+      <p>刪除後無法復原！</p>
+    </div>
+  `;
 
   const confirmToastEl = document.querySelector('#confirm-toast');
   const confirmToast = new bootstrap.Toast(confirmToastEl);
@@ -1590,42 +1545,32 @@ clearAllBtn.addEventListener('click', () => {
   const yesBtn = document.querySelector('#confirm-yes');
   const noBtn = document.querySelector('#confirm-no');
 
-  const cleanup = () => {
-    yesBtn.onclick = null;
-    noBtn.onclick = null;
-  };
-
-  yesBtn.onclick = () => {
-    cleanup();
+  const onConfirm = () => {
     confirmToast.hide();
 
-    // 清除記憶資料
     winnerData = [];
     drawnWinners.clear();
 
-    // 清空畫面
     winnerLists.forEach(list => list.innerHTML = '');
 
-    // 清除 localStorage
     localStorage.removeItem(`${STORAGE_KEY}_winnerData`);
     localStorage.removeItem(`${STORAGE_KEY}_drawnWinners`);
 
-    //更新統計
     updateCounts();
 
-    //成功 Toast
     const successBody = document.querySelector('#success-toast-body');
     successBody.innerHTML = `<p class="m-0">已清除所有中獎名單</p>`;
-    const successToastEl = document.querySelector('#success-toast');
-    const successToast = new bootstrap.Toast(successToastEl);
-    successToast.show();
+    new bootstrap.Toast(document.querySelector('#success-toast')).show();
   };
 
-  noBtn.onclick = () => {
-    cleanup();
+  const onCancel = () => {
     confirmToast.hide();
   };
+
+  yesBtn.addEventListener('click', onConfirm, { once: true });
+  noBtn.addEventListener('click', onCancel, { once: true });
 });
+
 
 //拉霸高度用
 
