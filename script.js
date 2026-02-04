@@ -149,7 +149,8 @@ const prizeAmounts = {
   6: 7000,
   7: 6000,
   8: 5000,
-  12: 3600
+  12: 3600,
+  13: 9000
 };
 
 
@@ -1073,10 +1074,11 @@ function handleWinnerText(winner) {
     specialBonusText = specialPrizeAmountInput.value
       ? `${Number(specialPrizeAmountInput.value).toLocaleString()}`
       : "";
-  } else if (prizeValue === "13") {
-    companyPrizeValue = 0;
-    specialBonusValue = 9000;
-  };
+    };
+  //else if (prizeValue === "13") {
+  //   companyPrizeValue = 0;
+  //   specialBonusValue = 9000;
+  // };
 
 
 
@@ -1115,9 +1117,6 @@ function handleWinnerText(winner) {
       <p>${displayText}【金額：${specialBonusText}】：${prizeAmountsText}</p>
       <p style="color:#D64545;">【${bonus2Text}】</p>
     `;
-  } else if (prizeValue === "13") {
-        li.innerHTML = `
-      <p>${displayText}【金額：${specialBonusValue}】：${prizeAmountsText}</p>`;
   } else {
     li.innerHTML = `
       <p>${displayText}${prizeAmountsText}</p>
@@ -1335,7 +1334,10 @@ function buildWinnerDropdown(inputEl) {
     return;
   };
 
-  winnerData.forEach(w => {
+  // ★ 關鍵：從最後一筆開始
+  for (let i = winnerData.length - 1; i >= 0; i--) {
+    const w = winnerData[i];
+
     const btn = document.createElement('button');
     btn.type = "button";
     btn.className = "list-group-item list-group-item-action";
@@ -1348,10 +1350,11 @@ function buildWinnerDropdown(inputEl) {
     });
 
     dropdown.appendChild(btn);
-  });
+  };
 
   dropdown.style.display = "block";
 };
+
 
 function filterWinnerDropdown(keyword) {
   const dropdown = document.getElementById('winner-dropdown');
