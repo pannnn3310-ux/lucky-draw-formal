@@ -63,7 +63,7 @@ function stopBi() {
 function playDon() {
   const a = new Audio(don.src);
   a.play();
-  a.onended = () => { a.src = ""; a = null; };
+  a.onended = () => { a.src = ""; };
 };
 
 function playCheer() {
@@ -595,8 +595,8 @@ async function doDraw() {
     if (baseReel.mapIndex[i] === winnerIndex) {
       unifiedTargetItemIndex = i;
       break;
-    }
-  }
+    };
+  };
 
   // 統一距離（所有軸都用這個）
   const unifiedTravelDistance =
@@ -791,16 +791,16 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3,
         if (reel.mapIndex[i] === targetIndex && i * ITEM_HEIGHT >= startPos) {
           reelTargetItemIndex = i;
           break;
-        }
-      }
+        };
+      };
       if (reelTargetItemIndex === null) {
         for (let i = reel.mapIndex.length - 1; i >= 0; i--) {
           if (reel.mapIndex[i] === targetIndex) {
             reelTargetItemIndex = i;
             break;
-          }
-        }
-      }
+          };
+        };
+      };
 
       const targetPos = reelTargetItemIndex * ITEM_HEIGHT;
       const travelDistance = unifiedTravelDistance !== null ? unifiedTravelDistance : totalHeight * fullRounds;
@@ -809,7 +809,7 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3,
         if (t < 0.3) return t * 2;
         if (t < 0.7) return 0.6;
         return 0.6 + (t - 0.7) * (0.4 / 0.3);
-      }
+      };
 
       function animate(now) {
         let t = (now - startTime) / duration;
@@ -820,7 +820,7 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3,
           reel.finalItemIndex = reelTargetItemIndex;
           resolve();
           return;
-        }
+        };
 
         let progress = t;
         if (usePause) progress = easeInOutPause(t);
@@ -831,7 +831,7 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3,
         reel.position = displayPos;
 
         requestAnimationFrame(animate);
-      }
+      };
 
       requestAnimationFrame(animate);
     }, delay);
