@@ -674,9 +674,9 @@ async function doDraw() {
     const halfRounds = Math.floor(fullRounds / 2);
 
     await Promise.all([
-      spinReel(reels[0], randomStopIndexes[0], firstHalfTime, 0, halfRounds),
-      spinReel(reels[1], randomStopIndexes[1], firstHalfTime, 0, halfRounds),
-      spinReel(reels[2], randomStopIndexes[2], firstHalfTime, 0, halfRounds)
+      spinReel(reels[0], randomStopIndexes[0], firstHalfTime, 0, halfRounds, unifiedTravelDistance, true),
+      spinReel(reels[1], randomStopIndexes[1], firstHalfTime, 0, halfRounds, unifiedTravelDistance, true),
+      spinReel(reels[2], randomStopIndexes[2], firstHalfTime, 0, halfRounds, unifiedTravelDistance, true)
     ]);
 
     // 只停一下（你要的「停格」）
@@ -700,18 +700,19 @@ async function doDraw() {
     // 暫停 + 動畫（淡出/彈入/空白邏輯）
     await freezeMidAnimation(midAnimationTime);
 
-    // 第二段滾輪：分別啟動，每軸帶入小 delay 以產生依序停的感覺
-    const p0 = spinReel(reels[0], reelTargetIndexes[0], firstPrizeReelDurations[0] , 0, fullRounds - halfRounds)
+    const unifiedDuration = Math.max(...firstPrizeReelDurations);
+    // 第二段滾輪
+    const p0 =  spinReel(reels[0], reelTargetIndexes[0], unifiedDuration, 0, fullRounds - halfRounds, unifiedTravelDistance, false)
       .then(() => {
         highlightReel(0)
         playDon();
       });
-    const p1 = spinReel(reels[1], reelTargetIndexes[1], firstPrizeReelDurations[1] , 150, fullRounds - halfRounds)
+    const p1 = spinReel(reels[1], reelTargetIndexes[1], unifiedDuration, 200, fullRounds - halfRounds, unifiedTravelDistance, false)
       .then(() => {
         highlightReel(1)
         playDon();
       });
-    const p2 = spinReel(reels[2], reelTargetIndexes[2], firstPrizeReelDurations[2] , 300, fullRounds - halfRounds)
+    const p2 = spinReel(reels[2], reelTargetIndexes[2], unifiedDuration, 400, fullRounds - halfRounds, unifiedTravelDistance, false)
       .then(() => {
         highlightReel(2);
         playDon();
@@ -773,52 +774,40 @@ async function doDraw() {
 
 
 
-function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3, unifiedTravelDistance = null) {
+function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3, unifiedTravelDistance = null, usePause = false) {
   return new Promise(resolve => {
     setTimeout(() => {
       const startTime = performance.now();
-
       const totalHeight = ITEM_HEIGHT * reel.items.length;
       const viewportHeight = document.querySelector('.scroll-viewport').offsetHeight;
       const centerOffset = (viewportHeight / 2) - (ITEM_HEIGHT / 2);
 
-      // 統一從上往下
       const startPos = ((reel.position % totalHeight) + totalHeight) % totalHeight;
 
-      // 找目標 item
-      const totalItems = reel.mapIndex.length;
       let reelTargetItemIndex = null;
-      for (let i = 0; i < totalItems; i++) {
+      for (let i = 0; i < reel.mapIndex.length; i++) {
         if (reel.mapIndex[i] === targetIndex && i * ITEM_HEIGHT >= startPos) {
           reelTargetItemIndex = i;
           break;
-        };
-      };
+        }
+      }
       if (reelTargetItemIndex === null) {
-        for (let i = totalItems - 1; i >= 0; i--) {
+        for (let i = reel.mapIndex.length - 1; i >= 0; i--) {
           if (reel.mapIndex[i] === targetIndex) {
             reelTargetItemIndex = i;
             break;
-          };
-        };
-      };
+          }
+        }
+      }
 
       const targetPos = reelTargetItemIndex * ITEM_HEIGHT;
+      const travelDistance = unifiedTravelDistance !== null ? unifiedTravelDistance : totalHeight * fullRounds;
 
-      // travelDistance 保留 fullRounds
-      // const travelDistance = totalHeight * fullRounds + (targetPos - startPos);
-      const travelDistance =
-        unifiedTravelDistance !== null
-          ? unifiedTravelDistance
-          : totalHeight * fullRounds + (targetPos - startPos);
-
-
-      // easing 函數：前快-中慢-後快
-      function easeInOutTriple(t) {
-        if (t < 0.2) return t * 3 * 0.5;           // 前快
-        if (t < 0.7) return 0.3 + (t - 0.2) * 0.4; // 中慢
-        return 0.7 + (t - 0.7) * 0.3 / 0.3;       // 後快
-      };
+      function easeInOutPause(t) {
+        if (t < 0.3) return t * 2;
+        if (t < 0.7) return 0.6;
+        return 0.6 + (t - 0.7) * (0.4 / 0.3);
+      }
 
       function animate(now) {
         let t = (now - startTime) / duration;
@@ -829,30 +818,23 @@ function spinReel(reel, targetIndex, duration = 3000, delay = 0, fullRounds = 3,
           reel.finalItemIndex = reelTargetItemIndex;
           resolve();
           return;
-        };
+        }
 
-        const prizeValue = Number(dropdownButton.dataset.value);
-        let progress;
-        if (prizeValue === 1) {
-          progress = easeInOutTriple(t);
-        } else {
-          progress = t;
-        };
+        let progress = t;
+        if (usePause) progress = easeInOutPause(t);
+
         const currentPos = startPos + travelDistance * progress;
-
-        // 統一從上往下
         const displayPos = ((currentPos % totalHeight) + totalHeight) % totalHeight;
         reel.el.style.transform = `translateY(-${displayPos}px)`;
         reel.position = displayPos;
 
         requestAnimationFrame(animate);
-      };
+      }
 
       requestAnimationFrame(animate);
     }, delay);
   });
 };
-
 
 
 function highlightReel(i) {
