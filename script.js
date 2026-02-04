@@ -63,6 +63,7 @@ function stopBi() {
 function playDon() {
   const a = new Audio(don.src);
   a.play();
+  a.onended = () => { a.src = ""; a = null; };
 };
 
 function playCheer() {
@@ -682,7 +683,7 @@ async function doDraw() {
     // 只停一下（你要的「停格」）
     await new Promise(resolve => setTimeout(resolve, 1200));
 
-    const firstPrizeExtraTime = 30000;
+    const firstPrizeExtraTime = 31000;
 
 
     const firstPrizeReelDurations = [
@@ -707,12 +708,12 @@ async function doDraw() {
         highlightReel(0)
         playDon();
       });
-    const p1 = spinReel(reels[1], reelTargetIndexes[1], unifiedDuration, 200, fullRounds - halfRounds, unifiedTravelDistance, false)
+    const p1 = spinReel(reels[1], reelTargetIndexes[1], unifiedDuration, 400, fullRounds - halfRounds, unifiedTravelDistance, false)
       .then(() => {
         highlightReel(1)
         playDon();
       });
-    const p2 = spinReel(reels[2], reelTargetIndexes[2], unifiedDuration, 400, fullRounds - halfRounds, unifiedTravelDistance, false)
+    const p2 = spinReel(reels[2], reelTargetIndexes[2], unifiedDuration, 800, fullRounds - halfRounds, unifiedTravelDistance, false)
       .then(() => {
         highlightReel(2);
         playDon();
