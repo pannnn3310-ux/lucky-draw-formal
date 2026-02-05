@@ -336,20 +336,6 @@ function stopAutoScroll() {
 };
 
 
-//input禁止手輸入
-specialPrizeInput2.addEventListener('change', () => {
-  const datalist = document.querySelector('#special-prize-list');
-  const value = specialPrizeInput2.value;
-
-  const valid = Array.from(datalist.options)
-    .some(option => option.value === value);
-
-  if (!valid) {
-    alert('請從名單中選擇有效的人！');
-    specialPrizeInput2.value = '';
-  }
-});
-
 
 // 下拉選單
 dropdownItems.forEach(item => {
