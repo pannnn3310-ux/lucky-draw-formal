@@ -250,7 +250,7 @@ function getFullRounds(prizeValue) {
     9: 9,
     10: 12,
     11: 12,
-    12: 2,
+    12: 9,
     13: 12,
   };
   return roundsMap[prizeValue] || 3;
@@ -296,7 +296,7 @@ function populateReels(prizeValue) {
       r.mapIndex.push(idx);
     });
   });
-}
+};
 
 
 
@@ -432,7 +432,7 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
       "9": Infinity,  // 幸運分享獎不限
       "10": Infinity, // 現金加碼獎不限
       "11": Infinity, // 特別追加獎不限
-      "12": 15,        // 追加獎
+      "12": 6,        // 追加獎
       "13": 2         // 東莞大寶-熱情贊助獎
     };
 
@@ -603,9 +603,9 @@ async function doDraw() {
     ];
   } else if (noDelayPrizes12.includes(prizeValue)) {
     reelDurations = [
-      800 + fullRounds,
-      800 + fullRounds,
-      800 + fullRounds
+      800 + fullRounds * 200 + 3000,
+      800 + fullRounds * 200 + 3000,
+      800 + fullRounds * 200 + 3000
     ];
   } else if (noDelayPrizes56.includes(prizeValue)) {
     reelDurations = [
@@ -633,7 +633,7 @@ async function doDraw() {
     9: 1900,                      //8s
     10: 9000,                     //16s
     11: 9000,                     //16s
-    12: 80,                       //2s
+    12: 1900,                     //8s
     13: 9000,                     //16s
   };
 
