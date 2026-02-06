@@ -432,7 +432,7 @@ document.querySelectorAll('.lever .prize-btn').forEach(btn => {
       "9": Infinity,  // 幸運分享獎不限
       "10": Infinity, // 現金加碼獎不限
       "11": Infinity, // 特別追加獎不限
-      "12": 6,        // 追加獎
+      "12": 15,        // 追加獎
       "13": 2         // 東莞大寶-熱情贊助獎
     };
 
